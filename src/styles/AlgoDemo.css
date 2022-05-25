@@ -78,9 +78,8 @@
 
 .elements_visualization {
     padding: 50px;
-    /* display: flex; */
-    display: block;
-    align-items: center;
+    display: flex;
+    overflow-x: scroll;
     justify-content: center;
 }
 
@@ -88,12 +87,13 @@
 .num_box {
     display: inline-block;
     margin: 0 20px;
-    width: 100px;
-    height: 100px;
+    aspect-ratio: 1/1;
+    width: 50px;
+    height: 50px;
     background: #FFFFFF;
     text-align: center;
     vertical-align: middle;
-    line-height: 100px;  /* Same as div width */
+    line-height: 50px;  /* Same as div width */
     border: 1px solid #000000;
     border-radius: 14px;
 }
