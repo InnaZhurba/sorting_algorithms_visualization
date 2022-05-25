@@ -1,0 +1,44 @@
+.header {
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.prj_header {
+    margin: 0;
+
+    font-family: 'Lexend';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 36px;
+    line-height: 45px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+
+    color: #000000;
+}
+
+.navigation {
+    align-items: center;
+    display: inline-flex;
+}
+
+.algo_type {
+    padding: 0 20px;
+    font-family: 'Lexend';
+    font-style: normal;
+    font-weight: 300;
+    font-size: 24px;
+    line-height: 30px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #838383;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+}
