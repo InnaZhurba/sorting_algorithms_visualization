@@ -3,8 +3,12 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 import "../styles/AlgoDemo.css";
-import { useState } from "react";
-import { ConnectingAirportsOutlined } from "@mui/icons-material";
+import React, { useContext, useState } from "react";
+
+const CurrentArrayContext = React.createContext({currentArray: [], setCurrentArray: () => {}});
+const ArraySizeContext = React.createContext({arraySize: [], setArraySize: () => {}});
+const CurrentInputContext = React.createContext({currentInput: [], setCurrentInput: () => {}});
+
 
 const AlgoDemo = () => {
     const [currentArray, setCurrentArray] = useState([]);
@@ -12,14 +16,25 @@ const AlgoDemo = () => {
     const [currentInput, setCurrentInput] = useState('');
     
     return <div className="algo_demo">
-        <InputField setCurrentArray={setCurrentArray} currentInput={currentInput} setCurrentInput={setCurrentInput}/>
-        <ArrayGenerator arraySize={arraySize} setArraySize={setArraySize} setCurrentArray={setCurrentArray} setCurrentInput={setCurrentInput}/>
-        <BoxContainer currentArray={currentArray}/>
-        <AlgoControls />
+        <CurrentArrayContext.Provider value={{currentArray: currentArray, setCurrentArray: (array) => setCurrentArray(array)}}>
+        <ArraySizeContext.Provider value={{arraySize: arraySize, setArraySize: setArraySize}}>
+        <CurrentInputContext.Provider value={{currentInput: currentInput, setCurrentInput: setCurrentInput}}>
+
+            <InputField />
+            <ArrayGenerator />
+            <BoxContainer />
+            <AlgoControls />
+
+        </CurrentInputContext.Provider>
+        </ArraySizeContext.Provider>
+        </CurrentArrayContext.Provider>
     </div>
 }
 
-const InputField = ({setCurrentArray, currentInput, setCurrentInput}) => {
+const InputField = () => {
+    const {setCurrentArray} = useContext(CurrentArrayContext);
+    const {currentInput, setCurrentInput} = useContext(CurrentInputContext);
+
     return <div className="array_input">
                 <input className="elements_input" value={currentInput} type="text" id="elements-input" onChange={(ev) => { 
                         setCurrentArray(ev.target.value.split(" "));
@@ -28,7 +43,11 @@ const InputField = ({setCurrentArray, currentInput, setCurrentInput}) => {
             </div>
 }
 
-const ArrayGenerator = ({arraySize, setArraySize, setCurrentArray, setCurrentInput}) => {
+const ArrayGenerator = () => {
+    const {setCurrentArray} = useContext(CurrentArrayContext);
+    const {arraySize, setArraySize} = useContext(ArraySizeContext);
+    const {setCurrentInput} = useContext(CurrentInputContext);
+
     const generateArray = () => {
         const generatedArray = Array.from({length: arraySize}, () => Math.floor(Math.random() * 100));
         setCurrentArray(generatedArray);        
@@ -67,7 +86,8 @@ const Box = ({value}) => {
     return <div className="num_box">{value}</div>
 }
 
-const BoxContainer = ({currentArray}) => {
+const BoxContainer = () => {
+    const {currentArray} = useContext(CurrentArrayContext);
     return <div className="elements_visualization">
         {currentArray.map((el, index) => {return <Box value={el} key={index}/>})}
     </div>
