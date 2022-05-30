@@ -1,7 +1,7 @@
 /*
  * i stands for the iteration count.
  */
-function selectionSort(state) {
+export function selectionSort(state) {
     let minIndex = state.i;
     for (let j = state.i + 1; j < state.array.length; j++) {
         if (state.array[j] < state.array[minIndex]) {
