@@ -1,13 +1,22 @@
 /*
  * i stands for the iteration count.
  */
-export function selectionSort(array, i) {
-    let minIndex = i;
-    for (let j = i + 1; j < array.length; j++)
-        if (array[j] < array[minIndex])
+function selectionSort(state) {
+    let minIndex = state.i;
+    for (let j = state.i + 1; j < state.array.length; j++) {
+        if (state.array[j] < state.array[minIndex]) {
             minIndex = j;
+        }
+    }
 
-    // minIndex and i are the indices to be swapped.
-    // i + 1 should be passed as the iteration count for the next function call.
-    return [minIndex, i];
+    [state.array[minIndex], state.array[state.i]] = [state.array[state.i], state.array[minIndex]];
+    state.toSwap1 = minIndex;
+    state.toSwap2 = state.i;
+    state.i += 1;
+
+    if (state.i === state.array.length - 1) {
+        state.done = true;
+    }
+
+    return state;
 }
