@@ -1,0 +1,22 @@
+{
+    "Bubble": {
+        "description": "Bubble Sort is the simplest sorting algorithm that works by repeatedly swapping the adjacent elements if they are in the wrong order. This algorithm is not suitable for large data sets as its average and worst case time complexity is quite high.",
+        "complexities": ["O(n²)", "O(n)", "O(n²)"]
+    },
+    "Insertion": {
+        "description": "Insertion sort is a simple sorting algorithm that works similar to the way you sort playing cards in your hands. The array is virtually split into a sorted and an unsorted part. Values from the unsorted part are picked and placed at the correct position in the sorted part.",
+        "complexities": ["O(n²)", "O(n)", "O(n²)"]
+    },
+    "Selection": {
+        "description": "The selection sort algorithm sorts an array by repeatedly finding the minimum element (considering ascending order) from unsorted part and putting it at the beginning. The algorithm maintains two subarrays in a given array. The subarray which is already sorted. Remaining subarray which is unsorted. In every iteration of selection sort, the minimum element (considering ascending order) from the unsorted subarray is picked and moved to the sorted subarray. ",
+        "complexities": ["O(n²)", "O(n²)", "O(n²)"]
+    },
+    "Quick": {
+        "description": "Like Merge Sort, QuickSort is a Divide and Conquer algorithm. It picks an element as pivot and partitions the given array around the picked pivot. There are many different versions of quickSort that pick pivot in different ways.",
+        "complexities": ["O(n²)", "O(n*Log n)", "O(n*Log n)"]
+    },
+    "Merge": {
+        "description": "Merge Sort follows the rule of Divide and Conquer to sort a given set of numbers/elements, recursively, hence consuming less time.",
+        "complexities": ["O(n*Log n)", "O(n*Log n)", "O(n*Log n)"]
+    }
+}
