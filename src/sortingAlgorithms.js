@@ -153,7 +153,39 @@ const mergeSort = ({leftStart, sortedArr, arrForMerging, idx, finished, size}) =
 }
 
 
+/*
+ * i stands for the iteration count.
+ * Usage:
+ *
+ * state = {array: [4, 3, 2, 1]};
+ * while (state.finished !== true) {
+ *     state = selectionSort(state);
+ *     swap(state.toSwap1, state.toSwap2);
+ * }
+ * swap(state.toSwap1, state.toSwap2);
+ */
+const selectionSort = ({array, i}) => {
+    i = typeof i === 'undefined' ? 0 : i;
+
+    let minIndex = i;
+    for (let j = i + 1; j < array.length; j++) {
+        if (array[j] < array[minIndex]) {
+            minIndex = j;
+        }
+    }
+
+    if (i === minIndex || i === array.length - 1) {
+        return {toSwap1: minIndex, toSwap2: i, finished: true};
+    }
+
+    [array[minIndex], array[i]] = [array[i], array[minIndex]];
+
+    return {array, i: i + 1, toSwap1: minIndex, toSwap2: i, finished: false};
+}
+
+
 export default { 
     bubbleSort,
-    mergeSort
+    mergeSort,
+    selectionSort
 };
