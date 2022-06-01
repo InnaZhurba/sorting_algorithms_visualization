@@ -5,7 +5,9 @@ import logo from './logo.svg';
 import './App.css';
 import Header from './components/Header';
 import InfoBlock from './components/InfoBlock';
-import AlgoDemo from './components/AlgoDemo';
+import AlgoDemo from './components/AlgoDemo';import { bubbleSort } from './sortingAlgorithms';
+import AlgoVisualizer from './components/AlgoVisualizer';
+;
 
 function App() {
   return (
@@ -19,7 +21,8 @@ function App() {
           <Route path="/quick" element={<InfoBlock title="Quick Sort"/>} />
           <Route path="/merge" element={<InfoBlock title="Merge Sort"/>} />
         </Routes>
-        <AlgoDemo />
+        {/* <AlgoDemo algorithm={bubbleSort}/> */}
+        <AlgoVisualizer algorithm={bubbleSort}/>
       </div>
     </div>
   );

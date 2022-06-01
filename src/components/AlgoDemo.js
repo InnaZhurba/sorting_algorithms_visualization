@@ -3,18 +3,50 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 import "../styles/AlgoDemo.css";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
+import { Pause } from "@mui/icons-material";
 
 const CurrentArrayContext = React.createContext({currentArray: [], setCurrentArray: () => {}});
 const ArraySizeContext = React.createContext({arraySize: [], setArraySize: () => {}});
 const CurrentInputContext = React.createContext({currentInput: [], setCurrentInput: () => {}});
 
 //  Main component
-const AlgoDemo = () => {
+const AlgoDemo = ({algorithm}) => {
     const [currentArray, setCurrentArray] = useState([]);
     const [arraySize, setArraySize] = useState(5);
     const [currentInput, setCurrentInput] = useState('');
+    const [shouldRun, setShouldRun] = useState(false);
+    const [currentAlgoState, setCurrentAlgoState] = useState({arr: []});
+
+    const generateArray = () => {
+        const generatedArray = Array.from({length: arraySize}, () => Math.floor(Math.random() * 100));
+        setCurrentArray(generatedArray);        
+        setCurrentInput(generatedArray.join([" "]));
+    }
+
+    // Same as componentDidMount
+    useEffect(() => {
+        generateArray();
+    }, []);
+
+    useEffect(() => {
+        if (shouldRun) {
+            console.log("Algorithm should run");
+            currentAlgoState.arr = currentArray.slice();
+            const newAlgoState = algorithm(currentAlgoState);
+            // setCurrentArray(newAlgoState.arr.slice());
+            setShouldRun(false);
+            setCurrentAlgoState(newAlgoState);
+        }
+
+    }, [shouldRun]);
+
+    useEffect(() => {
+        currentAlgoState.arr = currentArray.slice();
+        console.log(currentAlgoState.arr);
+        setCurrentAlgoState(currentAlgoState);
+    }, [currentArray]);
     
     return <div className="algo_demo">
         <CurrentArrayContext.Provider value={{currentArray: currentArray, setCurrentArray: (array) => setCurrentArray(array)}}>
@@ -22,9 +54,9 @@ const AlgoDemo = () => {
         <CurrentInputContext.Provider value={{currentInput: currentInput, setCurrentInput: setCurrentInput}}>
 
             <InputField />
-            <ArrayGenerator />
-            <BoxContainer />
-            <AlgoControls />
+            <ArrayGenerator generateArray={generateArray}/>
+            <BoxContainer shouldRun={shouldRun} setShouldRun={setShouldRun} currentAlgoState={currentAlgoState} />
+            <AlgoControls shouldRun={shouldRun} setShouldRun={setShouldRun}/>
 
         </CurrentInputContext.Provider>
         </ArraySizeContext.Provider>
@@ -44,16 +76,10 @@ const InputField = () => {
             </div>
 }
 
-const ArrayGenerator = () => {
+const ArrayGenerator = ({generateArray}) => {
     const {setCurrentArray} = useContext(CurrentArrayContext);
     const {arraySize, setArraySize} = useContext(ArraySizeContext);
     const {setCurrentInput} = useContext(CurrentInputContext);
-
-    const generateArray = () => {
-        const generatedArray = Array.from({length: arraySize}, () => Math.floor(Math.random() * 100));
-        setCurrentArray(generatedArray);        
-        setCurrentInput(generatedArray.join([" "]));
-    }
 
     return <div className="size_generation">
         <div className="array_size">
@@ -71,13 +97,13 @@ const ArrayGenerator = () => {
     </div>
 }
 
-const AlgoControls = () => {
+const AlgoControls = ({shouldRun, setShouldRun}) => {
     return <div className="algo_navigation">
         <div className="slider_wrapper">
             <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" />
         </div>
         <div className="playback_control">        
-            <IconButton><PlayArrowIcon/></IconButton>
+            { shouldRun ? <IconButton onClick={() => setShouldRun(false)}><Pause /></IconButton> : <IconButton onClick={() => setShouldRun(true)}><PlayArrowIcon/></IconButton> }
             <IconButton><RestartAltIcon/></IconButton>
         </div>
     </div>
@@ -87,23 +113,61 @@ const Box = ({value}) => {
     return <div className="num_box">{value}</div>
 }
 
-const BoxContainer = () => {
-    const {currentArray} = useContext(CurrentArrayContext);
-    const index1 = 0;
-    const index2 = 4;
+const AnimatedBox = ({value, animation, onAnimationComplete}) => {
+    return <motion.div className="num_box" onAnimationComplete={() => onAnimationComplete()} animate ={{
+        x: animation.x,
+        y: animation.y,
+    }} transition = {{duration: 3}}>
+        {value}
+    </motion.div>
+}
 
-    let animationForElementsByIndex = getSwapAnimation(index1, index2);
+const BoxContainer = ({setShouldRun, currentAlgoState}) => {
+    const {currentArray, setCurrentArray} = useContext(CurrentArrayContext);
+    const [firstAnimFinished, setFirstAnimFinished] = useState(false);
+    const [secondAnimFinished, setSecondAnimFinished] = useState(false);
+    const [animationForElements, setAnimationForElements] = useState([]);
+    const [arrayForAnimation, setArrayForAnimation] = useState([]);
 
+    useEffect(() => {
+        if (firstAnimFinished && secondAnimFinished) {
+            console.log("both animations finished!");
+            setFirstAnimFinished(false);
+            setSecondAnimFinished(false);
+
+            const {index1, index2} = currentAlgoState;
+            const swappedArray = swapElements(currentArray, index1, index2);
+            setArrayForAnimation(swappedArray);
+            setCurrentArray(swappedArray);
+            setShouldRun(true);
+        }
+    }, [firstAnimFinished, secondAnimFinished]);
+
+    useEffect(() => {
+        const {swappedIndex1, swappedIndex2, arr} = currentAlgoState;
+        const newAnimationForElements = getSwapAnimation(swappedIndex1, swappedIndex2);
+        setAnimationForElements(newAnimationForElements);
+    }, [currentAlgoState]);
+
+    useEffect(() => {
+        console.log("Set array for animation: "+currentArray);
+        setArrayForAnimation(currentArray);
+    }, [currentArray]);
+
+    let firstSetterSent = false;
     return <div className="elements_visualization">
-        {currentArray.map((el, index) => {
-            if (animationForElementsByIndex[index]) {
-                const {x, y} = animationForElementsByIndex[index];
-                return <motion.div animate = {{
-                    x: x,
-                    y: y,
-                }}>
-                    <Box value={el} key={index}/>
-                </motion.div>
+        {arrayForAnimation.map((el, index) => {
+            if (animationForElements[index]) {
+                let setterFuncion;
+                if (!firstSetterSent) {
+                    firstSetterSent = true;
+                    setterFuncion = () => setFirstAnimFinished(true);
+                } else {
+                    setterFuncion = () => setSecondAnimFinished(true);
+                }
+
+                const animation = animationForElements[index];
+                return <AnimatedBox value={el} key={index} animation={animation} onAnimationComplete={() => setterFuncion()} />
             }
             else {
                 return <Box value={el} key={index}/>
@@ -132,5 +196,13 @@ const getSwapAnimation = (index1, index2) => {
 
     return animationForElementsByIndex;
 }
+
+const swapElements = (arr, index1, index2) => {
+    const temp = arr[index1];
+    arr[index1] = arr[index2];
+    arr[index2] = temp;
+    return arr;
+}
+
 
 export default AlgoDemo;
