@@ -5,78 +5,140 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Pause } from "@mui/icons-material";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+
+const PlayStatusContext = React.createContext({isPlaying: false, setIsPlaying: () => {}})
 
 const AlgoVisualizer = ({algorithm}) => {
+    const [initialArray, setInitialArray] = useState([]);
     const [currentArray, setCurrentArray] = useState([]);
-    const [currentAlgoState, setCurrentAlgoState] = useState({});
+    const [arraySizeForGen, setArraySizeForGen] = useState(5);
+    const [currentInput, setCurrentInput] = useState("");
+    const [currentAlgoState, setCurrentAlgoState] = useState({finished: false});
     const [shouldUpdate, setShouldUpdate] = useState(false);
+    const [sortingSpeed, setSortingSpeed] = useState(1);
+    const [isPlaying, setIsPlaying] = useState(false);
+    // const [isFinished, setIsFinished] = useState(false);
+
+    const generateArray = () => {
+        const generatedArray = Array.from({length: arraySizeForGen}, () => Math.floor(Math.random() * 100));
+        setCurrentArray(generatedArray);        
+        setInitialArray(generatedArray.slice());
+        setCurrentInput(generatedArray.join([" "]));
+        setCurrentAlgoState({finished: false});
+    };
 
     // Same as componentDidMount
     useEffect(() => {
-        setCurrentArray([1, 3, 2, 6, 5, 1, 3, 2]);
+        generateArray();
     }, []);
 
     useEffect(() => {
-        if (shouldUpdate) {
-            console.log("running algorithm");
-            const newAlgoState = algorithm({arr:currentArray.slice(), ...currentAlgoState});
-            console.log(newAlgoState);
-            setCurrentAlgoState(newAlgoState);
+        if (shouldUpdate && isPlaying) {
+            if (currentAlgoState.finished) {
+                setIsPlaying(false);
+            } else {
+                console.log("running algorithm");
+                const newAlgoState = algorithm({arr:currentArray.slice(), ...currentAlgoState});
+                console.log(newAlgoState);
+                setCurrentAlgoState(newAlgoState);
+                if (newAlgoState.finished) {
+                    setIsPlaying(false);
+                }
+            }
             
             setShouldUpdate(false);
         }
     }, [shouldUpdate]);
 
     return <div className="algo_demo">
-        <InputField />
-        <ArrayGenerator />
-        <BoxContainer currentAlgoState={currentAlgoState} currentArray={currentArray} setCurrentArray={setCurrentArray} setShouldUpdate={setShouldUpdate}/>
-        <AlgoControls setShouldUpdate={setShouldUpdate}/>
+        <PlayStatusContext.Provider value={{isPlaying: isPlaying, setIsPlaying: setIsPlaying}}>
+            <InputField currentInput={currentInput} setCurrentInput={setCurrentInput} setCurrentArray={setCurrentArray} setCurrentAlgoState={setCurrentAlgoState} />
+            <ArrayGenerator generateArray={generateArray} arraySizeForGen={arraySizeForGen} setArraySizeForGen={setArraySizeForGen} />
+            <BoxContainer currentAlgoState={currentAlgoState}
+                            currentArray={currentArray}
+                            setCurrentArray={setCurrentArray}
+                            setShouldUpdate={setShouldUpdate}
+                            sortingSpeed={sortingSpeed}
+                            />
+            <AlgoControls setShouldUpdate={setShouldUpdate} setSortingSpeed={setSortingSpeed} setCurrentArray={setCurrentArray} initialArray={initialArray}/>
+        </PlayStatusContext.Provider>
     </div>
 }
 
-const InputField = () => {
+const InputField = ({currentInput, setCurrentInput, setCurrentArray, setCurrentAlgoState}) => {
+    const {isPlaying} = useContext(PlayStatusContext);
     return <div className="array_input">
-                <input className="elements_input" type="text" id="elements-input"/>
+                <input className="elements_input" type="text" id="elements-input" value={currentInput} onChange={
+                    (ev) => {
+                        if (!isPlaying) {
+                            setCurrentArray(ev.target.value.split(" "));
+                            setCurrentInput(ev.target.value);
+                            setCurrentAlgoState({finished: false});
+                        }
+                    }
+                }/>
             </div>
 }
 
-const ArrayGenerator = () => {
+const ArrayGenerator = ({generateArray, arraySizeForGen, setArraySizeForGen}) => {
     return <div className="size_generation">
         <div className="array_size">
-            <label className="algo_description">Array size: </label>
-            <input className="size_input" type="text" id="size-input" />
+            <label className="algo_description" >Array size: </label>
+            <input className="size_input" type="text" id="size-input" value={arraySizeForGen} onChange={(ev) => {
+                const parsedInt = parseInt(ev.target.value);
+                setArraySizeForGen(isNaN(parsedInt) ? 0 : parsedInt);
+                }}/>
         </div>
         <div className="generate_button_wrapper">
-            <button className="generate_button" type="button">
+            <button className="generate_button" type="button" onClick={() => generateArray()}>
                 Generate
             </button>
         </div>
     </div>
 }
 
-const AlgoControls = ({setShouldUpdate}) => {
-    const [buttonWasPressed, setButtonWasPressed] = useState(false);
+const AlgoControls = ({setShouldUpdate, setSortingSpeed, setCurrentArray, initialArray}) => {
+    // const [buttonWasPressed, setButtonWasPressed] = useState(false);
+    const {isPlaying, setIsPlaying} = useContext(PlayStatusContext);
+
+    const defaultSpeed = 4.5 - 50/100 * 4;
+
+    useEffect(() => {
+        setSortingSpeed(defaultSpeed);
+    }, []);
 
     return <div className="algo_navigation">
         <div className="slider_wrapper">
-            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" />
+            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" onChange={
+                (ev) => {
+                    setSortingSpeed(4.5 - ev.target.value/100 * 4);
+                }
+            }/>
         </div>
         <div className="playback_control">        
-            { buttonWasPressed ? <IconButton onClick={() => {
-                setButtonWasPressed(false)
-                setShouldUpdate(false);
-            }}><Pause /></IconButton> : <IconButton onClick={() => {
-                setButtonWasPressed(true)
+            { !isPlaying ? <IconButton onClick={() => {
+                // setButtonWasPressed(true)
                 setShouldUpdate(true);
-                }}><PlayArrowIcon/></IconButton>}
-            <IconButton><RestartAltIcon/></IconButton>
+                setIsPlaying(true);
+            }}><PlayArrowIcon /></IconButton> : <IconButton onClick={() => {
+                // setButtonWasPressed(false)
+                setShouldUpdate(false);
+                setIsPlaying(false);
+                }}><Pause /></IconButton>}
+            <IconButton onClick={
+                () => {
+                    // It doesn't work :(
+                    setIsPlaying(false);
+                    console.log("Initial array: " + initialArray);
+                    setCurrentArray(initialArray.slice());
+                }
+            }><RestartAltIcon/></IconButton>
         </div>
     </div>
 }
 
-const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShouldUpdate}) => {
+const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShouldUpdate, sortingSpeed}) => {
     const [firstAnimFinished, setFirstAnimFinished] = useState(false);
     const [secondAnimFinished, setSecondAnimFinished] = useState(false);
     const [animationForElements, setAnimationForElements] = useState([]);
@@ -116,7 +178,7 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
                     }
 
                     const animation = animationForElements[index];
-                    return <AnimatedBox value={el} key={index} animation={animation} onAnimationComplete={() => setterFuncion()} />
+                    return <AnimatedBox value={el} key={index} animation={animation} animationDuration={sortingSpeed} onAnimationComplete={() => setterFuncion()} />
                 }
                 else {
                     return <Box value={el} key={index}/>
@@ -130,11 +192,11 @@ const Box = ({value}) => {
     return <div className="num_box">{value}</div>
 }
 
-const AnimatedBox = ({value, animation, onAnimationComplete}) => {
+const AnimatedBox = ({value, animation, onAnimationComplete, animationDuration}) => {
     return <motion.div className="num_box" onAnimationComplete={() => onAnimationComplete()} animate ={{
         x: animation.x,
         y: animation.y,
-    }} transition = {{duration: 1}}>
+    }} transition = {{duration: animationDuration}}>
         {value}
     </motion.div>
 }
