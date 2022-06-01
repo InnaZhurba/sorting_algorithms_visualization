@@ -153,6 +153,118 @@ export const bubbleSort = ({i, j, n, arr, finished}) => {
 // }
 
 
+/*
+ * i stands for the iteration count.
+ * Usage:
+ *
+ * state = {array: [4, 3, 2, 1]};
+ * while (state.finished !== true) {
+ *     state = selectionSort(state);
+ *     swap(state.toSwap1, state.toSwap2);
+ * }
+ * swap(state.toSwap1, state.toSwap2);
+ */
+const selectionSort = ({array, i}) => {
+    i = typeof i === 'undefined' ? 0 : i;
+
+    let minIndex = i;
+    for (let j = i + 1; j < array.length; j++) {
+        if (array[j] < array[minIndex]) {
+            minIndex = j;
+        }
+    }
+
+    if (i === minIndex || i === array.length - 1) {
+        return {toSwap1: minIndex, toSwap2: i, finished: true};
+    }
+
+    [array[minIndex], array[i]] = [array[i], array[minIndex]];
+
+    return {array, i: i + 1, toSwap1: minIndex, toSwap2: i, finished: false};
+}
+
+
+/*
+ * Helper function for quickSort. Does only one step.
+ */
+const partition = ({array, low, high, i, j}) => {
+    i = typeof i === 'undefined' ? low - 1 : i;
+    j = typeof j === 'undefined' ? low : j;
+
+    let pivot = array[high];
+
+    for (; j <= high - 1; j++) {
+        if (array[j] <= pivot) {
+            i++;
+            [array[i], array[j]] = [array[j], array[i]];
+
+            return {array, i, j, finished: false};
+        }
+    }
+
+    [array[i + 1], array[high]] = [array[high], array[i + 1]];
+
+    return {array, i: i + 1, j: high, pivot: i + 1, low, high, finished: true};
+}
+
+
+/*
+ * i, j are the indices to be swapped.
+ * Usage:
+ *
+ * state = {array: [4, 3, 2, 1]}
+ * while (state.finished !== true) {
+ *     state = quickSort(state);
+ *     swap(state.i, state.j);
+ * }
+ * swap(state.i, state.j);
+ */
+const quickSort = ({array, stack, top, i, j, high, low, partitionFinished}) => {
+    if (typeof stack === 'undefined') {
+        stack = new Array(array.length);
+        stack.fill(0);
+
+        top = -1;
+        stack[++top] = 0;
+        stack[++top] = array.length - 1;
+
+        partitionFinished = true;
+    }
+
+    if (partitionFinished) {
+        high = stack[top--];
+        low = stack[top--];
+    }
+
+    let partitionState = partition({array, low, high, i, j});
+
+    if (!partitionState.finished) {
+        return {
+            array, stack, top, i: partitionState.i, j: partitionState.j, low, high,
+            partitionFinished: false, finished: false
+        };
+    }
+
+    let pivot = partitionState.pivot;
+
+    if (pivot - 1 > low) {
+        stack[++top] = low;
+        stack[++top] = pivot - 1;
+    }
+
+    if (pivot + 1 < high) {
+        stack[++top] = pivot + 1;
+        stack[++top] = high;
+    }
+
+    if (top >= 0) {
+        return {array, stack, top, partitionFinished: true, finished: false};
+    }
+
+    return {array, stack, top, finished: true};
+}
+
+
 export default { 
     bubbleSort,
     // mergeSort
