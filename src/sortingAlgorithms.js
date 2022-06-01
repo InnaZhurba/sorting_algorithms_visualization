@@ -184,8 +184,90 @@ const selectionSort = ({array, i}) => {
 }
 
 
+/*
+ * Helper function for quickSort. Does only one step.
+ */
+const partition = ({array, low, high, i, j}) => {
+    i = typeof i === 'undefined' ? low - 1 : i;
+    j = typeof j === 'undefined' ? low : j;
+
+    let pivot = array[high];
+
+    for (; j <= high - 1; j++) {
+        if (array[j] <= pivot) {
+            i++;
+            [array[i], array[j]] = [array[j], array[i]];
+
+            return {array, i, j, finished: false};
+        }
+    }
+
+    [array[i + 1], array[high]] = [array[high], array[i + 1]];
+
+    return {array, i: i + 1, j: high, pivot: i + 1, low, high, finished: true};
+}
+
+
+/*
+ * i, j are the indices to be swapped.
+ * Usage:
+ *
+ * state = {array: [4, 3, 2, 1]}
+ * while (state.finished !== true) {
+ *     state = quickSort(state);
+ *     swap(state.i, state.j);
+ * }
+ * swap(state.i, state.j);
+ */
+const quickSort = ({array, stack, top, i, j, high, low, partitionFinished}) => {
+    if (typeof stack === 'undefined') {
+        stack = new Array(array.length);
+        stack.fill(0);
+
+        top = -1;
+        stack[++top] = 0;
+        stack[++top] = array.length - 1;
+
+        partitionFinished = true;
+    }
+
+    if (partitionFinished) {
+        high = stack[top--];
+        low = stack[top--];
+    }
+
+    let partitionState = partition({array, low, high, i, j});
+
+    if (!partitionState.finished) {
+        return {
+            array, stack, top, i: partitionState.i, j: partitionState.j, low, high,
+            partitionFinished: false, finished: false
+        };
+    }
+
+    let pivot = partitionState.pivot;
+
+    if (pivot - 1 > low) {
+        stack[++top] = low;
+        stack[++top] = pivot - 1;
+    }
+
+    if (pivot + 1 < high) {
+        stack[++top] = pivot + 1;
+        stack[++top] = high;
+    }
+
+    if (top >= 0) {
+        return {array, stack, top, partitionFinished: true, finished: false};
+    }
+
+    return {array, stack, top, finished: true};
+}
+
+
 export default { 
     bubbleSort,
     mergeSort,
-    selectionSort
+    selectionSort,
+    quickSort
 };
