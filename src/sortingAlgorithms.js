@@ -45,8 +45,8 @@ const mergeSort = ({leftStart, sortedArr, arrForMerging, idx, finished, size}) =
     
     
 
-    while (size < sortedArr.length) {
-      while (leftStart < sortedArr.length) {
+    if (size < sortedArr.length) {
+      if (leftStart < sortedArr.length) {
         if (left >= leftEnd && right >= rightEnd) {
           leftStart += 2*size;
 
@@ -58,7 +58,7 @@ const mergeSort = ({leftStart, sortedArr, arrForMerging, idx, finished, size}) =
           idx = left;
         }
                 
-        while (left < leftEnd && right < rightEnd) {
+        if (left < leftEnd && right < rightEnd) {
           swap_idx = [left, right];
           if (sortedArr[left] <= sortedArr[right]) {
             arrForMerging[idx++] = sortedArr[left++];
@@ -82,7 +82,7 @@ const mergeSort = ({leftStart, sortedArr, arrForMerging, idx, finished, size}) =
             swap_idx: swap_idx};
         }
       
-        while (left < leftEnd) {
+        if (left < leftEnd) {
           swap_idx = [left, left]
           swap = false;
           arrForMerging[idx++] = sortedArr[left++];
@@ -100,7 +100,7 @@ const mergeSort = ({leftStart, sortedArr, arrForMerging, idx, finished, size}) =
             swap_idx: swap_idx};
         }
       
-        while (right < rightEnd) {
+        if (right < rightEnd) {
           swap_idx = [right, right]
           swap = false;
           arrForMerging[idx++] = sortedArr[right++];
@@ -156,7 +156,7 @@ export default {
 };
 
 
-// MERGE SORT
+// MERGE
 // EXAMPLE OF USAGE
 // objectA = {
 //     sortedArr: new Array(1, 3, 2, 4),
