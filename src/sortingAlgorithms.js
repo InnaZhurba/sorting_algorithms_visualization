@@ -1,30 +1,37 @@
 export const bubbleSort = ({i, j, n, arr, finished}) => {
-    finished = typeof i === 'undefined' ? false : i;
-    i = typeof i === 'undefined' ? 0 : i;
-    j = typeof j === 'undefined' ? 0 : j;
-    n = typeof n === 'undefined' ? arr.length : n;
+    finished = typeof finished === 'undefined' ? false : finished;
+    i = i == undefined ? 0 : i;
+    j = j == undefined ? 0 : j;
+    n = n == undefined ? arr.length : n;
+    console.log(arr);
+    console.log(`i: ${i}    j: ${j}`);
 
-    for (; i < n; ++i) {
-        let j = i;
-        for (; j < n; ++j) {
+    for (; i < n; i++) {
+        for (; j < n-1; j++) {
             if (arr[j] > arr[j+1]) {
-                // const temp = arr[j];
-                // arr[j] = arr[j+1];
-                // arr[j+1] = temp;
-                
-                // console.log(arr);
-
+                const newJ = j+1;
                 return {
                     i: i,
-                    j: j,
+                    j: newJ,
                     n: n,
                     finished: false,
-                    // arr: arr,
                     swappedIndex1: j,
                     swappedIndex2: j+1,
                 };
+            } else {
+                const newJ = j+1;
+                return {
+                    indexForSelect1: j,
+                    indexForSelect2: j+1,
+                    i: i,
+                    j: newJ,
+                    n: n,
+                    finished: false,
+                };
             }
         }
+        j = 0;
+        console.log("hello from hell");
     }
 
     return {finished: true};
@@ -164,6 +171,7 @@ export const bubbleSort = ({i, j, n, arr, finished}) => {
  * }
  * swap(state.toSwap1, state.toSwap2);
  */
+
 const selectionSort = ({array, i}) => {
     i = typeof i === 'undefined' ? 0 : i;
 

@@ -142,6 +142,8 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
     const [firstAnimFinished, setFirstAnimFinished] = useState(false);
     const [secondAnimFinished, setSecondAnimFinished] = useState(false);
     const [animationForElements, setAnimationForElements] = useState([]);
+    const [indexesForSwap, setIndexesForSwap] = useState({});
+    const [indexesForSelect, setIndexesForSelect] = useState({});
 
     // When both animations are finished
     useEffect(() => {
@@ -159,16 +161,63 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
 
 
     useEffect(() => {
+        console.log("currentAlgoState bruh");
         const {swappedIndex1, swappedIndex2} = currentAlgoState;
+        if (swappedIndex1 == undefined) {
+            const {indexForSelect1, indexForSelect2} = currentAlgoState;
+            setIndexesForSelect({
+                indexForSelect1: indexForSelect1,
+                indexForSelect2: indexForSelect2,
+            });
+        } else {
+            setIndexesForSwap({
+                swappedIndex1: swappedIndex1, 
+                swappedIndex2: swappedIndex2
+            });
+        }
         const newAnimationForElements = getSwapAnimation(swappedIndex1, swappedIndex2);
         setAnimationForElements(newAnimationForElements);
     }, [currentAlgoState]);
+
+    useEffect(() => {
+        const {swappedIndex1, swappedIndex2} = indexesForSwap;
+        const newAnimationForElements = getSwapAnimation(swappedIndex1, swappedIndex2);
+        setAnimationForElements(newAnimationForElements);
+    }, [indexesForSwap]);
+
+    useEffect(() => {
+        const {indexForSelect1, indexForSelect2} = indexesForSelect;
+
+        let newAnimationForElements = {};
+        newAnimationForElements[indexForSelect1] = {
+            x: [0, 0, 0],
+            y: [0, 5, 0],
+            backgroundColor: "grey"
+        };
+        newAnimationForElements[indexForSelect2] = {
+            x: [0, 0, 0],
+            y: [0, 5, 0],
+            backgroundColor: "grey"
+        };
+
+        setAnimationForElements(newAnimationForElements);
+    }, [indexesForSelect]);
 
     let firstSetterSent = false;
     return <div className="elements_visualization">
         {
             currentArray.map((el, index) => {
+                const {indexForSelect1, indexForSelect2} = indexesForSelect;
+                const {swappedIndex1, swappedIndex2} = indexesForSwap;
+
                 if (animationForElements[index]) {
+                    {/* const animation = animationForElements[index];
+                    if (index == swappedIndex1) {
+                        return <AnimatedBox value={el} key={index} animation={animation} animationDuration={sortingSpeed} onAnimationComplete={() => setFirstAnimFinished()} />
+                    } else if (index == swappedIndex2) {
+                        return <AnimatedBox value={el} key={index} animation={animation} animationDuration={sortingSpeed} onAnimationComplete={() => setSecondAnimFinished()} />
+                    } */}
+
                     let setterFuncion;
                     if (!firstSetterSent) {
                         firstSetterSent = true;
@@ -196,6 +245,7 @@ const AnimatedBox = ({value, animation, onAnimationComplete, animationDuration})
     return <motion.div className="num_box" onAnimationComplete={() => onAnimationComplete()} animate ={{
         x: animation.x,
         y: animation.y,
+        backgroundColor: animation.backgroundColor,
     }} transition = {{duration: animationDuration}}>
         {value}
     </motion.div>
@@ -210,11 +260,13 @@ const getSwapAnimation = (index1, index2) => {
     let animationForElementsByIndex = {};
     animationForElementsByIndex[index1] = {
         x: [0, 0, xdir_index1, xdir_index1],
-        y: [0, -100, -100, 0]
+        y: [0, -100, -100, 0],
+        backgroundColor: "yellow"
     };
     animationForElementsByIndex[index2] = {
         x: [0, 0, xdir_index2, xdir_index2],
-        y: [0, 100, 100, 0]
+        y: [0, 100, 100, 0],
+        backgroundColor: "yellow"
     };
 
     return animationForElementsByIndex;

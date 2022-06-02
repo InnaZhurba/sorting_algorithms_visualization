@@ -5,7 +5,7 @@ import logo from './logo.svg';
 import './App.css';
 import Header from './components/Header';
 import InfoBlock from './components/InfoBlock';
-import AlgoDemo from './components/AlgoDemo';import { bubbleSort } from './sortingAlgorithms';
+import { bubbleSort } from './sortingAlgorithms';
 import AlgoVisualizer from './components/AlgoVisualizer';
 ;
 

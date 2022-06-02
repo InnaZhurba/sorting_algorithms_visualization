@@ -1,182 +1,248 @@
-import { duration, IconButton, Slider } from "@mui/material";
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-
 import "../styles/AlgoDemo.css";
-import React, { useContext, useEffect, useState } from "react";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+
+import { IconButton, Slider } from "@mui/material";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Pause } from "@mui/icons-material";
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import { motion } from "framer-motion";
+import React, { useContext, useEffect, useState } from "react";
 
-const CurrentArrayContext = React.createContext({currentArray: [], setCurrentArray: () => {}});
-const ArraySizeContext = React.createContext({arraySize: [], setArraySize: () => {}});
-const CurrentInputContext = React.createContext({currentInput: [], setCurrentInput: () => {}});
+const PlayStatusContext = React.createContext({isPlaying: false, setIsPlaying: () => {}})
 
-//  Main component
-const AlgoDemo = ({algorithm}) => {
+const AlgoVisualizer = ({algorithm}) => {
+    const [initialArray, setInitialArray] = useState([]);
     const [currentArray, setCurrentArray] = useState([]);
-    const [arraySize, setArraySize] = useState(5);
-    const [currentInput, setCurrentInput] = useState('');
-    const [shouldRun, setShouldRun] = useState(false);
-    const [currentAlgoState, setCurrentAlgoState] = useState({arr: []});
+    const [arraySizeForGen, setArraySizeForGen] = useState(5);
+    const [currentInput, setCurrentInput] = useState("");
+    const [currentAlgoState, setCurrentAlgoState] = useState({finished: false});
+    const [shouldUpdate, setShouldUpdate] = useState(false);
+    const [sortingSpeed, setSortingSpeed] = useState(1);
+    const [isPlaying, setIsPlaying] = useState(false);
+    // const [isFinished, setIsFinished] = useState(false);
 
     const generateArray = () => {
-        const generatedArray = Array.from({length: arraySize}, () => Math.floor(Math.random() * 100));
+        const generatedArray = Array.from({length: arraySizeForGen}, () => Math.floor(Math.random() * 100));
         setCurrentArray(generatedArray);        
+        setInitialArray(generatedArray.slice());
         setCurrentInput(generatedArray.join([" "]));
-    }
+        setCurrentAlgoState({finished: false});
+    };
 
     // Same as componentDidMount
     useEffect(() => {
         generateArray();
+        setCurrentArray([1, 3, 2, 6, 5, 4]);
     }, []);
 
     useEffect(() => {
-        if (shouldRun) {
-            console.log("Algorithm should run");
-            currentAlgoState.arr = currentArray.slice();
-            const newAlgoState = algorithm(currentAlgoState);
-            // setCurrentArray(newAlgoState.arr.slice());
-            setShouldRun(false);
-            setCurrentAlgoState(newAlgoState);
+        if (shouldUpdate && isPlaying) {
+            if (currentAlgoState.finished) {
+                setIsPlaying(false);
+            } else {
+                console.log("running algorithm");
+                const newAlgoState = algorithm({arr:currentArray.slice(), ...currentAlgoState});
+                console.log(newAlgoState);
+                setCurrentAlgoState(newAlgoState);
+                console.log("set new state for currentAlgoState");
+                if (newAlgoState.finished) {
+                    setIsPlaying(false);
+                }
+            }
+            
+            setShouldUpdate(false);
         }
+    }, [shouldUpdate]);
 
-    }, [shouldRun]);
-
-    useEffect(() => {
-        currentAlgoState.arr = currentArray.slice();
-        console.log(currentAlgoState.arr);
-        setCurrentAlgoState(currentAlgoState);
-    }, [currentArray]);
-    
     return <div className="algo_demo">
-        <CurrentArrayContext.Provider value={{currentArray: currentArray, setCurrentArray: (array) => setCurrentArray(array)}}>
-        <ArraySizeContext.Provider value={{arraySize: arraySize, setArraySize: setArraySize}}>
-        <CurrentInputContext.Provider value={{currentInput: currentInput, setCurrentInput: setCurrentInput}}>
-
-            <InputField />
-            <ArrayGenerator generateArray={generateArray}/>
-            <BoxContainer shouldRun={shouldRun} setShouldRun={setShouldRun} currentAlgoState={currentAlgoState} />
-            <AlgoControls shouldRun={shouldRun} setShouldRun={setShouldRun}/>
-
-        </CurrentInputContext.Provider>
-        </ArraySizeContext.Provider>
-        </CurrentArrayContext.Provider>
+        <PlayStatusContext.Provider value={{isPlaying: isPlaying, setIsPlaying: setIsPlaying}}>
+            <InputField currentInput={currentInput} setCurrentInput={setCurrentInput} setCurrentArray={setCurrentArray} setCurrentAlgoState={setCurrentAlgoState} />
+            <ArrayGenerator generateArray={generateArray} arraySizeForGen={arraySizeForGen} setArraySizeForGen={setArraySizeForGen} />
+            <BoxContainer currentAlgoState={currentAlgoState}
+                            currentArray={currentArray}
+                            setCurrentArray={setCurrentArray}
+                            setShouldUpdate={setShouldUpdate}
+                            sortingSpeed={sortingSpeed}
+                            />
+            <AlgoControls setShouldUpdate={setShouldUpdate} setSortingSpeed={setSortingSpeed} setCurrentArray={setCurrentArray} initialArray={initialArray}/>
+        </PlayStatusContext.Provider>
     </div>
 }
 
-const InputField = () => {
-    const {setCurrentArray} = useContext(CurrentArrayContext);
-    const {currentInput, setCurrentInput} = useContext(CurrentInputContext);
-
+const InputField = ({currentInput, setCurrentInput, setCurrentArray, setCurrentAlgoState}) => {
+    const {isPlaying} = useContext(PlayStatusContext);
     return <div className="array_input">
-                <input className="elements_input" value={currentInput} type="text" id="elements-input" onChange={(ev) => { 
-                        setCurrentArray(ev.target.value.split(" "));
-                        setCurrentInput(ev.target.value);
-                    }}/>
+                <input className="elements_input" type="text" id="elements-input" value={currentInput} onChange={
+                    (ev) => {
+                        if (!isPlaying) {
+                            setCurrentArray(ev.target.value.split(" "));
+                            setCurrentInput(ev.target.value);
+                            setCurrentAlgoState({finished: false});
+                        }
+                    }
+                }/>
             </div>
 }
 
-const ArrayGenerator = ({generateArray}) => {
-    const {setCurrentArray} = useContext(CurrentArrayContext);
-    const {arraySize, setArraySize} = useContext(ArraySizeContext);
-    const {setCurrentInput} = useContext(CurrentInputContext);
-
+const ArrayGenerator = ({generateArray, arraySizeForGen, setArraySizeForGen}) => {
     return <div className="size_generation">
         <div className="array_size">
-            <label className="algo_description">Array size: </label>
-            <input className="size_input" value={arraySize} type="text" id="size-input" onChange={(ev) => {
+            <label className="algo_description" >Array size: </label>
+            <input className="size_input" type="text" id="size-input" value={arraySizeForGen} onChange={(ev) => {
                 const parsedInt = parseInt(ev.target.value);
-                setArraySize(isNaN(parsedInt) ? 0 : parsedInt);
-                }} />
+                setArraySizeForGen(isNaN(parsedInt) ? 0 : parsedInt);
+                }}/>
         </div>
         <div className="generate_button_wrapper">
-            <button className="generate_button" type="button" onClick={() => {generateArray()}}>
+            <button className="generate_button" type="button" onClick={() => generateArray()}>
                 Generate
             </button>
         </div>
     </div>
 }
 
-const AlgoControls = ({shouldRun, setShouldRun}) => {
+const AlgoControls = ({setShouldUpdate, setSortingSpeed, setCurrentArray, initialArray}) => {
+    // const [buttonWasPressed, setButtonWasPressed] = useState(false);
+    const {isPlaying, setIsPlaying} = useContext(PlayStatusContext);
+
+    const defaultSpeed = 4.5 - 50/100 * 4;
+
+    useEffect(() => {
+        setSortingSpeed(defaultSpeed);
+    }, []);
+
     return <div className="algo_navigation">
         <div className="slider_wrapper">
-            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" />
+            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" onChange={
+                (ev) => {
+                    setSortingSpeed(4.5 - ev.target.value/100 * 4);
+                }
+            }/>
         </div>
         <div className="playback_control">        
-            { shouldRun ? <IconButton onClick={() => setShouldRun(false)}><Pause /></IconButton> : <IconButton onClick={() => setShouldRun(true)}><PlayArrowIcon/></IconButton> }
-            <IconButton><RestartAltIcon/></IconButton>
+            { !isPlaying ? <IconButton onClick={() => {
+                // setButtonWasPressed(true)
+                setShouldUpdate(true);
+                setIsPlaying(true);
+            }}><PlayArrowIcon /></IconButton> : <IconButton onClick={() => {
+                // setButtonWasPressed(false)
+                setShouldUpdate(false);
+                setIsPlaying(false);
+                }}><Pause /></IconButton>}
+            <IconButton onClick={
+                () => {
+                    // It doesn't work :(
+                    setIsPlaying(false);
+                    console.log("Initial array: " + initialArray);
+                    setCurrentArray(initialArray.slice());
+                }
+            }><RestartAltIcon/></IconButton>
         </div>
     </div>
 }
 
-const Box = ({value}) => {
-    return <div className="num_box">{value}</div>
-}
-
-const AnimatedBox = ({value, animation, onAnimationComplete}) => {
-    return <motion.div className="num_box" onAnimationComplete={() => onAnimationComplete()} animate ={{
-        x: animation.x,
-        y: animation.y,
-    }} transition = {{duration: 3}}>
-        {value}
-    </motion.div>
-}
-
-const BoxContainer = ({setShouldRun, currentAlgoState}) => {
-    const {currentArray, setCurrentArray} = useContext(CurrentArrayContext);
+const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShouldUpdate, sortingSpeed}) => {
     const [firstAnimFinished, setFirstAnimFinished] = useState(false);
     const [secondAnimFinished, setSecondAnimFinished] = useState(false);
+    // const [firstElemHighLighted, setFirstElemHighLighted] = useState(false);
+    // const [secondElemHighLighted, setSecondElemHighLighted] = useState(false);
     const [animationForElements, setAnimationForElements] = useState([]);
-    const [arrayForAnimation, setArrayForAnimation] = useState([]);
+    const [indexesToSwap, setIndexesToSwap] = useState({});
 
+    // When both animations are finished
     useEffect(() => {
         if (firstAnimFinished && secondAnimFinished) {
             console.log("both animations finished!");
+            const {swappedIndex1, swappedIndex2} = currentAlgoState;
+            if (typeof swappedIndex1 !== 'undefined') {
+                const newCurrentArray = swapElements(currentArray, swappedIndex1, swappedIndex2);
+                setCurrentArray(newCurrentArray);
+            } else {
+                // setCurrentArray(currentArray.slice());
+            }
+
             setFirstAnimFinished(false);
             setSecondAnimFinished(false);
-
-            const {index1, index2} = currentAlgoState;
-            const swappedArray = swapElements(currentArray, index1, index2);
-            setArrayForAnimation(swappedArray);
-            setCurrentArray(swappedArray);
-            setShouldRun(true);
+            setShouldUpdate(true);
         }
     }, [firstAnimFinished, secondAnimFinished]);
 
+    // useEffect(() => {
+    //     if (firstElemHighLighted && secondElemHighLighted) {
+    //         console.log("both elements were highlighted");
+    //         setShouldUpdate(true);
+    //         setFirstElemHighLighted(false);
+    //         setSecondElemHighLighted(false);
+    //     }
+    // }, [firstElemHighLighted, secondElemHighLighted]);
+
+
     useEffect(() => {
-        const {swappedIndex1, swappedIndex2, arr} = currentAlgoState;
-        const newAnimationForElements = getSwapAnimation(swappedIndex1, swappedIndex2);
-        setAnimationForElements(newAnimationForElements);
+        const {swappedIndex1, swappedIndex2} = currentAlgoState;
+        console.log(typeof swappedIndex1)
+        if (swappedIndex1 !== undefined) {
+            const newAnimationForElements = getSwapAnimation(swappedIndex1, swappedIndex2);
+            setAnimationForElements(newAnimationForElements);
+        }
     }, [currentAlgoState]);
 
-    useEffect(() => {
-        console.log("Set array for animation: "+currentArray);
-        setArrayForAnimation(currentArray);
-    }, [currentArray]);
-
-    let firstSetterSent = false;
+    // let firstSetterSent = false;
     return <div className="elements_visualization">
-        {arrayForAnimation.map((el, index) => {
-            if (animationForElements[index]) {
-                let setterFuncion;
+        {
+            currentArray.map((el, index) => {
+                {/* let setterFuncion;
                 if (!firstSetterSent) {
                     firstSetterSent = true;
                     setterFuncion = () => setFirstAnimFinished(true);
                 } else {
                     setterFuncion = () => setSecondAnimFinished(true);
+                } */}
+                const {i, j} = currentAlgoState;
+                const {swappedIndex1, swappedIndex2} = currentAlgoState;
+                console.log(`current index ${index}`)
+                console.log(`i: ${i}   j: ${j}  swappedIndex1:  ${swappedIndex1}  swappedIndex2: ${swappedIndex2}`);
+                
+                if (index === swappedIndex1) {
+                    console.log(index + ": " + swappedIndex1);
+                    const animation = animationForElements[index];
+                    console.log(animation);
+                    return <AnimatedBox value={el} key={index} animation={animation} animationDuration={sortingSpeed} onAnimationComplete={() => setFirstAnimFinished()} />
+                } else if (index === swappedIndex2) {
+                    const animation = animationForElements[index];
+                    return <AnimatedBox value={el} key={index} animation={animation} animationDuration={sortingSpeed} onAnimationComplete={() => setSecondAnimFinished()} />
+                } else {
+                    const stillAnimation = {
+                            x: [0, 1],
+                            y: [0, 1],
+                        };
+                    if (index === i) {
+                        return <AnimatedBox value={el} key={index} backgroundColor={"#808080"} animation={stillAnimation} onAnimationComplete={() => setFirstAnimFinished()}/>
+                    } else if( index === j) {
+                        return <AnimatedBox value={el} key={index} backgroundColor={"#808080"} animation={stillAnimation} onAnimationComplete={() => setSecondAnimFinished()}/>
+                    } else {
+                        return <Box value={el} key={index}/>
+                    }
                 }
-
-                const animation = animationForElements[index];
-                return <AnimatedBox value={el} key={index} animation={animation} onAnimationComplete={() => setterFuncion()} />
-            }
-            else {
-                return <Box value={el} key={index}/>
-            }
-            
-            })}
+            })
+        }
     </div>
 }
 
+const Box = ({value, backgroundColor}) => {
+    backgroundColor = typeof backgroundColor === 'undefined' ? "#fff" : backgroundColor;
+    return <div className="num_box" style={{backgroundColor: backgroundColor}}>{value}</div>
+}
+
+const AnimatedBox = ({value, animation, onAnimationComplete, animationDuration, backgroundColor}) => {
+    backgroundColor = typeof backgroundColor === 'undefined' ? "#32CD32" : backgroundColor;
+    return <motion.div className="num_box" onAnimationComplete={() => onAnimationComplete()} animate ={{
+        x: animation.x,
+        y: animation.y,
+    }}
+    transition = {{duration: animationDuration}}
+    style={{backgroundColor: backgroundColor}}>
+        {value}
+    </motion.div>
+}
 
 const getSwapAnimation = (index1, index2) => {
     const boxWidth = 50;
@@ -204,5 +270,4 @@ const swapElements = (arr, index1, index2) => {
     return arr;
 }
 
-
-export default AlgoDemo;
+// export default AlgoVisualizer;
