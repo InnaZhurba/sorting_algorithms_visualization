@@ -184,6 +184,27 @@ const selectionSort = ({array, i}) => {
 }
 
 
+const insertionSort = ({array, i}) => {
+    i = typeof i === 'undefined' ? 1 : i;
+
+    let n = array.length;
+    // for (let i = 1; i < n; i++) {
+        // Choosing the first element in our unsorted subarray
+    let current = array[i];
+    // The last element of our sorted subarray
+    let j = i-1; 
+    while ((j > -1) && (current < inputArr[j])) {
+        array[j+1] = array[j];
+        j--;
+    }
+    array[j+1] = current;
+    // }
+    if (i === n-1){
+        return {array, i: i+1, finished:true}    
+    }
+    return {array, i: i+1, finished:false} 
+}
+
 /*
  * Helper function for quickSort. Does only one step.
  */
