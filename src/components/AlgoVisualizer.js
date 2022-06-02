@@ -1,4 +1,4 @@
-import "../styles/AlgoDemo.css";
+import "../styles/AlgoVisualizer.css";
 
 import { IconButton, Slider } from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';

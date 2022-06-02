@@ -201,7 +201,7 @@ const insertionSort = ({array, i}) => {
     let current = array[i];
     // The last element of our sorted subarray
     let j = i-1; 
-    while ((j > -1) && (current < inputArr[j])) {
+    while ((j > -1) && (current < array[j])) {
         array[j+1] = array[j];
         j--;
     }
