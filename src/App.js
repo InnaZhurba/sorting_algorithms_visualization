@@ -12,7 +12,17 @@ import AlgoVisualizer from './components/AlgoVisualizer';
 function App() {
   return (
     <div className="App">
+    
       <Routes>
+      <Route path="/" element={
+          <>
+            <Header highlightedLink={"/bubble"} />
+            <div className="main_body">
+              <InfoBlock title="Bubble Sort"/>
+              <AlgoVisualizer algorithm={bubbleSort}/>
+            </div>
+          </>
+        } />
         <Route path="/bubble" element={
           <>
             <Header highlightedLink={"/bubble"} />
