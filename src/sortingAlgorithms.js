@@ -1,10 +1,8 @@
 export const bubbleSort = ({i, j, n, arr, finished}) => {
-    finished = typeof finished === 'undefined' ? false : finished;
+    finished = finished == undefined ? false : finished;
     i = i == undefined ? 0 : i;
     j = j == undefined ? 0 : j;
     n = n == undefined ? arr.length : n;
-    console.log(arr);
-    console.log(`i: ${i}    j: ${j}`);
 
     for (; i < n; i++) {
         for (; j < n-1; j++) {
@@ -31,7 +29,6 @@ export const bubbleSort = ({i, j, n, arr, finished}) => {
             }
         }
         j = 0;
-        console.log("hello from hell");
     }
 
     return {finished: true};
@@ -39,7 +36,7 @@ export const bubbleSort = ({i, j, n, arr, finished}) => {
 }
 
 
-// const mergeSort = ({leftStart, sortedArr, arrForMerging, idx, finished, size}) => {
+// export const mergeSort = ({leftStart, sortedArr, arrForMerging, idx, finished, size}) => {
 //     leftStart = typeof leftStart === 'undefined' ? 0 : leftStart;
 
 //     idx = typeof idx === 'undefined' ? 0 : idx;
@@ -172,8 +169,8 @@ export const bubbleSort = ({i, j, n, arr, finished}) => {
  * swap(state.toSwap1, state.toSwap2);
  */
 
-const selectionSort = ({array, i}) => {
-    i = typeof i === 'undefined' ? 0 : i;
+export const selectionSort = ({array, i}) => {
+    i = i == undefined ? 0 : i;
 
     let minIndex = i;
     for (let j = i + 1; j < array.length; j++) {
@@ -183,16 +180,16 @@ const selectionSort = ({array, i}) => {
     }
 
     if (i === minIndex || i === array.length - 1) {
-        return {toSwap1: minIndex, toSwap2: i, finished: true};
+        return {swappedIndex1: minIndex, swappedIndex2: i, finished: true};
     }
 
-    [array[minIndex], array[i]] = [array[i], array[minIndex]];
+    // [array[minIndex], array[i]] = [array[i], array[minIndex]];
 
-    return {array, i: i + 1, toSwap1: minIndex, toSwap2: i, finished: false};
+    return {array, i: i + 1, swappedIndex1: minIndex, swappedIndex2: i, finished: false};
 }
 
 
-const insertionSort = ({array, i}) => {
+export const insertionSort = ({array, i}) => {
     i = typeof i === 'undefined' ? 1 : i;
 
     let n = array.length;
@@ -248,7 +245,7 @@ const partition = ({array, low, high, i, j}) => {
  * }
  * swap(state.i, state.j);
  */
-const quickSort = ({array, stack, top, i, j, high, low, partitionFinished}) => {
+export const quickSort = ({array, stack, top, i, j, high, low, partitionFinished}) => {
     if (typeof stack === 'undefined') {
         stack = new Array(array.length);
         stack.fill(0);
@@ -292,9 +289,3 @@ const quickSort = ({array, stack, top, i, j, high, low, partitionFinished}) => {
 
     return {array, stack, top, finished: true};
 }
-
-
-export default { 
-    bubbleSort,
-    // mergeSort
-};
