@@ -163,11 +163,16 @@ export const bubbleSort = ({i, j, n, arr, finished}) => {
  */
 export const selectionSort = ({arr, i, j, minIndex}) => {
     i = i === undefined ? 0 : i;
+
+    if (i === arr.length - 1) {
+        return {finished: true};
+    }
+
     j = j === undefined ? i + 1 : j;
     minIndex = minIndex === undefined ? i : minIndex;
 
     let newMinIndex = minIndex;
-    if (arr[j] < arr[minIndex]) {
+    if (arr[j] <= arr[minIndex]) {
         newMinIndex = j;
     }
 
@@ -178,105 +183,109 @@ export const selectionSort = ({arr, i, j, minIndex}) => {
         };
     }
 
-    if (i === minIndex || i === arr.length - 2) {
-        return {finished: true};
+    if (minIndex === i) {
+        return {i: i + 1, indexForSelect1: i, indexForSelect2: arr.length - 1, finished: false};
     }
 
     return {i: i + 1, swappedIndex1: minIndex, swappedIndex2: i, finished: false};
 }
 
 
-export const insertionSort = ({i, j, n, array, finished}) => {
+export const insertionSort = ({i, j, n, arr, current, key, finished}) => {
     i = i === undefined ? 1 : i;
     j = j === undefined ? i - 1 : j;
-    n = n === undefined ? array.length : n;
-    finished = finished == undefined ? false : finished;
+    n = n === undefined ? arr.length : n;
+    key = key === undefined ? arr[i] : key;
+    current = current === undefined ? i : current;
 
+
+    while ((j > -1) && (arr[current] < arr[j])) {
+        let new_j = j-1;
+        let prom = arr[j];
+
+        arr[j] = arr[current];
+        arr[current] = prom;
+        return {arr, i: i, 
+                j: new_j, 
+                swappedIndex1: current, 
+                swappedIndex2: j, 
+                current: j, 
+                key: arr[current], 
+                finished:false}
+    }
 
     
-
-    // current = current === undefined ? array[i] : current;
-
-    // for (let i = 1; i < n; i++) {
-        // Choosing the first element in our unsorted subarray
-    // let current = array[i];
-    // The last element of our sorted subarray
-    // let j = i-1; 
-    if ((j > -1) && (array[i] < array[j])) {
-        // array[j+1] = array[j];
-        let new_j = j-1;
-        return {array, i: i, j: new_j, swappedIndex1: array[j+1], swappedIndex2: array[j], j, finished:false}
-    }
-
-    // array[j+1] = current;
-    // }
-    // let n = array.length;
-    if (i === n-1){
+    if ((i === n-1) && (arr[i] > arr[i-1])){
         return {finished:true}    
     }
-    let new_j_here = i-1;
 
-    return {array, i: i+1, j: new_j_here, indexForSelect1: i-1, indexForSelect1: i, finished:false} 
+    let new_i = i+1;
+    return {arr, i: new_i, indexForSelect1: new_i, indexForSelect2: i, key: arr[new_i], current: new_i, finished:false} 
 }
 
 /*
  * Helper function for quickSort. Does only one step.
+ * low, high - partition boundaries.
+ * i, j - iteration counters.
  */
-const partition = ({array, low, high, i, j}) => {
+const partition = ({arr, low, high, i, j}) => {
     i = typeof i === 'undefined' ? low - 1 : i;
     j = typeof j === 'undefined' ? low : j;
 
-    let pivot = array[high];
-
-    for (; j <= high - 1; j++) {
-        if (array[j] <= pivot) {
+    if (j <= high - 1) {
+        if (arr[j] <= arr[high]) {
             i++;
-            [array[i], array[j]] = [array[j], array[i]];
-
-            return {array, i, j, finished: false};
+            if (i !== j) {
+                return {i, j, toSwap: true, finished: false};
+            }
         }
+        return {i, j, toSwap: false, finished: false};
     }
 
-    [array[i + 1], array[high]] = [array[high], array[i + 1]];
-
-    return {array, i: i + 1, j: high, pivot: i + 1, low, high, finished: true};
+    return {pivot: i + 1, finished: true};
 }
 
 
 /*
- * i, j are the indices to be swapped.
- * Usage:
- *
- * state = {array: [4, 3, 2, 1]}
- * while (state.finished !== true) {
- *     state = quickSort(state);
- *     swap(state.i, state.j);
- * }
- * swap(state.i, state.j);
+ * stack, top - partition boundaries' stack and its top.
+ * i, j - iteration counters.
+ * low, high - current partition boundaries.
  */
-export const quickSort = ({array, stack, top, i, j, high, low, partitionFinished}) => {
+export const quickSort = ({arr, stack, top, i, j, high, low, partitionFinished}) => {
     if (typeof stack === 'undefined') {
-        stack = new Array(array.length);
+        stack = new Array(arr.length);
         stack.fill(0);
 
         top = -1;
         stack[++top] = 0;
-        stack[++top] = array.length - 1;
+        stack[++top] = arr.length - 1;
 
         partitionFinished = true;
     }
 
     if (partitionFinished) {
+        if (top < 0) {
+            return {finished: true};
+        }
+
         high = stack[top--];
         low = stack[top--];
     }
 
-    let partitionState = partition({array, low, high, i, j});
+    let partitionState = partition({arr, low, high, i, j});
 
     if (!partitionState.finished) {
+        if (partitionState.toSwap) {
+            return {
+                stack, top, i: partitionState.i, j: partitionState.j + 1, low, high,
+                swappedIndex1: partitionState.i, swappedIndex2: partitionState.j,
+                partitionFinished: false, finished: false
+            };
+        }
         return {
-            array, stack, top, i: partitionState.i, j: partitionState.j, low, high,
-            partitionFinished: false, finished: false
+            stack, top, i: partitionState.i, j: partitionState.j + 1, low, high,
+            indexForSelect1: partitionState.j, indexForSelect2: high, partitionFinished: false,
+            finished: false
         };
     }
 
@@ -292,9 +301,15 @@ export const quickSort = ({array, stack, top, i, j, high, low, partitionFinished
         stack[++top] = high;
     }
 
-    if (top >= 0) {
-        return {array, stack, top, partitionFinished: true, finished: false};
+    if (pivot === high) {
+        return {
+            stack, top, indexForSelect1: high - 1, indexForSelect2: high,
+            partitionFinished: true, finished: false
+        };
     }
 
-    return {array, stack, top, finished: true};
+    return {
+        stack, top, swappedIndex1: pivot, swappedIndex2: high,
+        partitionFinished: true, finished: false
+    };
 }
