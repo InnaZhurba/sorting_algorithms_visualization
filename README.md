@@ -36,7 +36,7 @@ web@lover:~/sorting_algorithms_visualization$ npm start
 
 One of the pages with the visualization looks like this:
 
-![image](https://user-images.githubusercontent.com/50978411/171923626-e8cab00a-b124-47e5-b53c-2037e0c60f10.png)
+![page-example](photos/page_example.png)
 
 There are 2 ways to use our visualizer:
 
