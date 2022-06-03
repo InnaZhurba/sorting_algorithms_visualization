@@ -19,7 +19,6 @@ const AlgoVisualizer = ({algorithm}) => {
     const [shouldUpdate, setShouldUpdate] = useState(false);
     const [sortingSpeed, setSortingSpeed] = useState(1);
     const [isPlaying, setIsPlaying] = useState(false);
-    // const [isFinished, setIsFinished] = useState(false);
 
     const currentLocation = useLocation();
 
@@ -62,7 +61,7 @@ const AlgoVisualizer = ({algorithm}) => {
 
     return <div className="algo_demo">
         <PlayStatusContext.Provider value={{isPlaying: isPlaying, setIsPlaying: setIsPlaying}}>
-            <InputField currentInput={currentInput} setCurrentInput={setCurrentInput} setCurrentArray={setCurrentArray} setCurrentAlgoState={setCurrentAlgoState} />
+            <InputField currentInput={currentInput} setCurrentInput={setCurrentInput} setCurrentArray={setCurrentArray} setInitialArray={setInitialArray} setCurrentAlgoState={setCurrentAlgoState} />
             <ArrayGenerator generateArray={generateArray} arraySizeForGen={arraySizeForGen} setArraySizeForGen={setArraySizeForGen} />
             <BoxContainer currentAlgoState={currentAlgoState}
                             currentArray={currentArray}
@@ -75,7 +74,7 @@ const AlgoVisualizer = ({algorithm}) => {
     </div>
 }
 
-const InputField = ({currentInput, setCurrentInput, setCurrentArray, setCurrentAlgoState}) => {
+const InputField = ({currentInput, setCurrentInput, setInitialArray, setCurrentArray, setCurrentAlgoState}) => {
     const {isPlaying} = useContext(PlayStatusContext);
     return <div className="array_input">
                 <input className="elements_input" type="text" id="elements-input" value={currentInput} onChange={
@@ -89,6 +88,7 @@ const InputField = ({currentInput, setCurrentInput, setCurrentArray, setCurrentA
                                 return result;
                             }, []);
                             setCurrentArray(newCurrentArray);
+                            setInitialArray(newCurrentArray.slice());
                             setCurrentInput(ev.target.value);
                             setCurrentAlgoState({finished: false});
                         }
@@ -141,11 +141,9 @@ const AlgoControls = ({setShouldUpdate, setSortingSpeed, setCurrentArray, setCur
         </div>
         <div className="playback_control">        
             { !isPlaying ? <IconButton onClick={() => {
-                // setButtonWasPressed(true)
                 setShouldUpdate(true);
                 setIsPlaying(true);
             }}><PlayArrowIcon /></IconButton> : <IconButton onClick={() => {
-                // setButtonWasPressed(false)
                 setShouldUpdate(false);
                 setIsPlaying(false);
                 }}><Pause /></IconButton>}
@@ -283,12 +281,12 @@ const getSwapAnimation = (index1, index2) => {
     let animationForElementsByIndex = {};
     animationForElementsByIndex[index1] = {
         x: [0, 0, xdirIndex1, xdirIndex1],
-        y: [0, -100, -100, 0],
+        y: [0, -80, -80, 0],
         backgroundColor: "yellow"
     };
     animationForElementsByIndex[index2] = {
         x: [0, 0, xdirIndex2, xdirIndex2],
-        y: [0, 100, 100, 0],
+        y: [0, 80, 80, 0],
         backgroundColor: "yellow"
     };
 
