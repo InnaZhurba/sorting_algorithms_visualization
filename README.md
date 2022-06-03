@@ -6,7 +6,6 @@ This is our final web (React) project. It visualizes some of the most popular so
 - Insertion Sort
 - Selection Sort
 - Quick Sort
-- Merge Sort
 
 ## Team
 
