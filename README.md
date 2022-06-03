@@ -45,15 +45,9 @@ There are 2 ways to use our visualizer:
 
 In both cases you can choose the speed of the visualization by scrolling the scrollbar at the bottom of the page.
 
-![image](https://user-images.githubusercontent.com/50978411/171923867-d0de78e1-28fb-449f-a04c-ffde0d4f57d0.png)
-
 To start or stop the visualization, press the play button near the scrollbar.
 
-![image](https://user-images.githubusercontent.com/50978411/171923910-2375b939-1568-4e2b-a256-0c2c13b20c2d.png)
-
 To replay the visualization from the beginning, press the restart button next to the play button.
-
-![image](https://user-images.githubusercontent.com/50978411/171923954-d75602ba-b923-445c-ac04-d802d5bde182.png)
 
 ## Important
 
