@@ -61,7 +61,7 @@ const AlgoVisualizer = ({algorithm}) => {
                             setShouldUpdate={setShouldUpdate}
                             sortingSpeed={sortingSpeed}
                             />
-            <AlgoControls setShouldUpdate={setShouldUpdate} setSortingSpeed={setSortingSpeed} setCurrentArray={setCurrentArray} initialArray={initialArray}/>
+            <AlgoControls setShouldUpdate={setShouldUpdate} setSortingSpeed={setSortingSpeed} setCurrentArray={setCurrentArray} setCurrentAlgoState={setCurrentAlgoState} initialArray={initialArray}/>
         </PlayStatusContext.Provider>
     </div>
 }
@@ -98,7 +98,7 @@ const ArrayGenerator = ({generateArray, arraySizeForGen, setArraySizeForGen}) =>
     </div>
 }
 
-const AlgoControls = ({setShouldUpdate, setSortingSpeed, setCurrentArray, initialArray}) => {
+const AlgoControls = ({setShouldUpdate, setSortingSpeed, setCurrentArray, setCurrentAlgoState, initialArray}) => {
     // const [buttonWasPressed, setButtonWasPressed] = useState(false);
     const {isPlaying, setIsPlaying} = useContext(PlayStatusContext);
 
@@ -132,6 +132,7 @@ const AlgoControls = ({setShouldUpdate, setSortingSpeed, setCurrentArray, initia
                     setIsPlaying(false);
                     console.log("Initial array: " + initialArray);
                     setCurrentArray(initialArray.slice());
+                    setCurrentAlgoState({finished: false});
                 }
             }><RestartAltIcon/></IconButton>
         </div>
@@ -198,6 +199,7 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
             y: [0, 5, 0],
             backgroundColor: "grey"
         };
+        newAnimationForElements["duration"] = sortingSpeed/2;
 
         setAnimationForElements(newAnimationForElements);
     }, [indexesForSelect]);
@@ -206,17 +208,7 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
     return <div className="elements_visualization">
         {
             currentArray.map((el, index) => {
-                const {indexForSelect1, indexForSelect2} = indexesForSelect;
-                const {swappedIndex1, swappedIndex2} = indexesForSwap;
-
                 if (animationForElements[index]) {
-                    {/* const animation = animationForElements[index];
-                    if (index == swappedIndex1) {
-                        return <AnimatedBox value={el} key={index} animation={animation} animationDuration={sortingSpeed} onAnimationComplete={() => setFirstAnimFinished()} />
-                    } else if (index == swappedIndex2) {
-                        return <AnimatedBox value={el} key={index} animation={animation} animationDuration={sortingSpeed} onAnimationComplete={() => setSecondAnimFinished()} />
-                    } */}
-
                     let setterFuncion;
                     if (!firstSetterSent) {
                         firstSetterSent = true;
@@ -226,7 +218,9 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
                     }
 
                     const animation = animationForElements[index];
-                    return <AnimatedBox value={el} key={index} animation={animation} animationDuration={sortingSpeed} onAnimationComplete={() => setterFuncion()} />
+                    let {duration} = animationForElements;
+                    duration = duration == undefined ? sortingSpeed : duration;
+                    return <AnimatedBox value={el} key={index} animation={animation} animationDuration={duration} onAnimationComplete={() => setterFuncion()} />
                 }
                 else {
                     return <Box value={el} key={index}/>
@@ -253,17 +247,17 @@ const AnimatedBox = ({value, animation, onAnimationComplete, animationDuration})
 const getSwapAnimation = (index1, index2) => {
     const boxWidth = 50;
     const boxMargin = 20;
-    const xdir_index1 = (index1 > index2 ? -1 : 1)*Math.abs(index1-index2)*(boxWidth+2*boxMargin);
-    const xdir_index2 = -xdir_index1;
+    const xdirIndex1 = (index1 > index2 ? -1 : 1)*Math.abs(index1-index2)*(boxWidth+2*boxMargin);
+    const xdirIndex2 = -xdirIndex1;
 
     let animationForElementsByIndex = {};
     animationForElementsByIndex[index1] = {
-        x: [0, 0, xdir_index1, xdir_index1],
+        x: [0, 0, xdirIndex1, xdirIndex1],
         y: [0, -100, -100, 0],
         backgroundColor: "yellow"
     };
     animationForElementsByIndex[index2] = {
-        x: [0, 0, xdir_index2, xdir_index2],
+        x: [0, 0, xdirIndex2, xdirIndex2],
         y: [0, 100, 100, 0],
         backgroundColor: "yellow"
     };
