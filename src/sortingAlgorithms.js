@@ -35,126 +35,125 @@ export const bubbleSort = ({i, j, n, arr, finished}) => {
 
 }
 
+export const mergeSort = ({left, right, leftStart, leftEnd, rightEnd, arr, arrForMerging, idx, finished, sizeOfPart}) => {
+  leftStart = typeof leftStart === 'undefined' ? 0 : leftStart;
 
-// export const mergeSort = ({leftStart, sortedArr, arrForMerging, idx, finished, size}) => {
-//     leftStart = typeof leftStart === 'undefined' ? 0 : leftStart;
+  idx = typeof idx === 'undefined' ? 0 : idx;
+  finished = typeof finished === 'undefined' ? false : finished;
+  arrForMerging = typeof arrForMerging === 'undefined' ? new Array(arr.length) : arrForMerging;
+  sizeOfPart = typeof sizeOfPart === 'undefined' ? 1 : sizeOfPart;
 
-//     idx = typeof idx === 'undefined' ? 0 : idx;
-//     finished = typeof finished === 'undefined' ? false : finished;
-//     arrForMerging = typeof arrForMerging === 'undefined' ? new Array(sortedArr.length) : arrForMerging;
-//     size = typeof size === 'undefined' ? 1 : size;
+  left = typeof left === 'undefined' ? leftStart : left;
+  right = typeof right === 'undefined' ? Math.min(left + sizeOfPart, arr.length) : right;
 
-//     left = typeof left === 'undefined' ? leftStart : left;
-//     right = typeof right === 'undefined' ? Math.min(left + size, sortedArr.length) : right;
+  leftEnd = typeof leftEnd === 'undefined' ? right : leftEnd;
+  rightEnd = typeof rightEnd === 'undefined' ? Math.min(right + sizeOfPart, arr.length) : rightEnd;
+  
+  let swap_idx, swap;
 
-//     leftEnd = typeof leftEnd === 'undefined' ? right : leftEnd;
-//     rightEnd = typeof rightEnd === 'undefined' ? Math.min(right + size, sortedArr.length) : rightEnd;
+  while (sizeOfPart < arr.length) {
+    while (leftStart < arr.length) {
+      if (left >= leftEnd && right >= rightEnd) {
+        leftStart += 2*sizeOfPart;
+
+        left = leftStart;
+        right = Math.min(left + sizeOfPart, arr.length);
+        leftEnd = right;
+        rightEnd = Math.min(right + sizeOfPart, arr.length);
+
+        idx = left;
+      }
+              
+      if (left < leftEnd && right < rightEnd) {
+        swap_idx = [left, right];
+        if (arr[left] <= arr[right]) {
+          arrForMerging[idx++] = arr[left++];
+          swap = false;
+        } else {
+          arrForMerging[idx++] = arr[right++];
+          swap = true;
+        }
+  
+        return {left: left,
+          right: right, 
+          leftStart: leftStart,
+          leftEnd: leftEnd,
+          rightEnd: rightEnd,
+          arr: arr,
+          arrForMerging: arrForMerging,
+          idx: idx,
+          finished: finished,
+          sizeOfPart: sizeOfPart,
+          swap: swap,
+          swap_idx: swap_idx};
+      }
     
+      if (left < leftEnd) {
+        swap_idx = [left, left]
+        swap = false;
+        arrForMerging[idx++] = arr[left++];
+        return {left: left,
+          right: right, 
+          leftStart: leftStart,
+          leftEnd: leftEnd,
+          rightEnd: rightEnd,
+          arr: arr,
+          arrForMerging: arrForMerging,
+          idx: idx,
+          finished: finished,
+          sizeOfPart: sizeOfPart,
+          swap: swap,
+          swap_idx: swap_idx};
+      }
     
-
-//     if (size < sortedArr.length) {
-//       if (leftStart < sortedArr.length) {
-//         if (left >= leftEnd && right >= rightEnd) {
-//           leftStart += 2*size;
-
-//           left = leftStart;
-//           right = Math.min(left + size, sortedArr.length);
-//           leftEnd = right;
-//           rightEnd = Math.min(right + size, sortedArr.length);
-
-//           idx = left;
-//         }
-                
-//         if (left < leftEnd && right < rightEnd) {
-//           swap_idx = [left, right];
-//           if (sortedArr[left] <= sortedArr[right]) {
-//             arrForMerging[idx++] = sortedArr[left++];
-//             swap = false;
-//           } else {
-//             arrForMerging[idx++] = sortedArr[right++];
-//             swap = true;
-//           }
-    
-//           return {left: left,
-//             right: right, 
-//             leftStart: leftStart,
-//             leftEnd: leftEnd,
-//             rightEnd: rightEnd,
-//             sortedArr: sortedArr,
-//             arrForMerging: arrForMerging,
-//             idx: idx,
-//             finished: finished,
-//             size: size,
-//             swap: swap,
-//             swap_idx: swap_idx};
-//         }
+      if (right < rightEnd) {
+        swap_idx = [right, right]
+        swap = false;
+        arrForMerging[idx++] = arr[right++];
+        return {left: left,
+          right: right, 
+          leftStart: leftStart,
+          leftEnd: leftEnd,
+          rightEnd: rightEnd,
+          arr: arr,
+          arrForMerging: arrForMerging,
+          idx: idx,
+          finished: finished,
+          sizeOfPart: sizeOfPart,
+          swap: swap,
+          swap_idx: swap_idx};
+      } 
       
-//         if (left < leftEnd) {
-//           swap_idx = [left, left]
-//           swap = false;
-//           arrForMerging[idx++] = sortedArr[left++];
-//           return {left: left,
-//             right: right, 
-//             leftStart: leftStart,
-//             leftEnd: leftEnd,
-//             rightEnd: rightEnd,
-//             sortedArr: sortedArr,
-//             arrForMerging: arrForMerging,
-//             idx: idx,
-//             finished: finished,
-//             size: size,
-//             swap: swap,
-//             swap_idx: swap_idx};
-//         }
-      
-//         if (right < rightEnd) {
-//           swap_idx = [right, right]
-//           swap = false;
-//           arrForMerging[idx++] = sortedArr[right++];
-//           return {left: left,
-//             right: right, 
-//             leftStart: leftStart,
-//             leftEnd: leftEnd,
-//             rightEnd: rightEnd,
-//             sortedArr: sortedArr,
-//             arrForMerging: arrForMerging,
-//             idx: idx,
-//             finished: finished,
-//             size: size,
-//             swap: swap,
-//             swap_idx: swap_idx};
-//         }
-        
-//       }
+    }
 
-//       let tempArr = sortedArr;
-//       sortedArr = arrForMerging;
-//       arrForMerging = tempArr;  
-      
-//       size *= 2;
-//       leftStart = 0;
-
-//       left = leftStart;
-//       right = Math.min(left + size, sortedArr.length);
-//       leftEnd = right,
-//       rightEnd = Math.min(right + size, sortedArr.length);
-
-//       idx = left;
-//     }
+    let tempArr = arr;
+    arr = arrForMerging;
+    arrForMerging = tempArr;  
     
-//     return {left: left,
-//             right: right, 
-//             leftStart: leftStart,
-//             leftEnd: leftEnd,
-//             rightEnd: rightEnd,
-//             sortedArr: sortedArr,
-//             arrForMerging: arrForMerging,
-//             idx: idx,
-//             finished: true,
-//             size: size,
-//             swap: swap,
-//             swap_idx: swap_idx};
-// }
+    sizeOfPart *= 2;
+    leftStart = 0;
+
+    left = leftStart;
+    right = Math.min(left + sizeOfPart, arr.length);
+    leftEnd = right;
+    rightEnd = Math.min(right + sizeOfPart, arr.length);
+
+    idx = left;
+  }
+  
+  return {left: left,
+          right: right, 
+          leftStart: leftStart,
+          leftEnd: leftEnd,
+          rightEnd: rightEnd,
+          arr: arr,
+          arrForMerging: arrForMerging,
+          idx: idx,
+          finished: true,
+          sizeOfPart: sizeOfPart,
+          swap: swap,
+          swap_idx: swap_idx};
+}
 
 
 /*
