@@ -191,39 +191,37 @@ export const selectionSort = ({arr, i, j, minIndex}) => {
 }
 
 
-export const insertionSort = ({i, j, n, array, finished}) => {
+export const insertionSort = ({i, j, n, arr, current, key, finished}) => {
     i = i === undefined ? 1 : i;
     j = j === undefined ? i - 1 : j;
-    n = n === undefined ? array.length : n;
-    finished = finished == undefined ? false : finished;
+    n = n === undefined ? arr.length : n;
+    key = key === undefined ? arr[i] : key;
+    current = current === undefined ? i : current;
 
+
+    while ((j > -1) && (arr[current] < arr[j])) {
+        let new_j = j-1;
+        let prom = arr[j];
+
+        arr[j] = arr[current];
+        arr[current] = prom;
+        return {arr, i: i, 
+                j: new_j, 
+                swappedIndex1: current, 
+                swappedIndex2: j, 
+                current: j, 
+                key: arr[current], 
+                finished:false}
+    }
 
     
-
-    // current = current === undefined ? array[i] : current;
-
-    // for (let i = 1; i < n; i++) {
-        // Choosing the first element in our unsorted subarray
-    // let current = array[i];
-    // The last element of our sorted subarray
-    // let j = i-1; 
-    if ((j > -1) && (array[i] < array[j])) {
-        // array[j+1] = array[j];
-        let new_j = j-1;
-        return {array, i: i, j: new_j, swappedIndex1: array[j+1], swappedIndex2: array[j], j, finished:false}
-    }
-
-    // array[j+1] = current;
-    // }
-    // let n = array.length;
-    if (i === n-1){
+    if ((i === n-1) && (arr[i] > arr[i-1])){
         return {finished:true}    
     }
-    let new_j_here = i-1;
 
-    return {array, i: i+1, j: new_j_here, indexForSelect1: i-1, indexForSelect1: i, finished:false} 
+    let new_i = i+1;
+    return {arr, i: new_i, indexForSelect1: new_i, indexForSelect2: i, key: arr[new_i], current: new_i, finished:false} 
 }
-
 
 /*
  * Helper function for quickSort. Does only one step.
