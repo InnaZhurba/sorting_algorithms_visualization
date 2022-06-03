@@ -191,25 +191,37 @@ export const selectionSort = ({arr, i, j, minIndex}) => {
 }
 
 
-export const insertionSort = ({array, i}) => {
-    i = typeof i === 'undefined' ? 1 : i;
+export const insertionSort = ({i, j, n, array, finished}) => {
+    i = i === undefined ? 1 : i;
+    j = j === undefined ? i - 1 : j;
+    n = n === undefined ? array.length : n;
+    finished = finished == undefined ? false : finished;
 
-    let n = array.length;
+
+    
+
+    // current = current === undefined ? array[i] : current;
+
     // for (let i = 1; i < n; i++) {
         // Choosing the first element in our unsorted subarray
-    let current = array[i];
+    // let current = array[i];
     // The last element of our sorted subarray
-    let j = i-1; 
-    while ((j > -1) && (current < array[j])) {
-        array[j+1] = array[j];
-        j--;
+    // let j = i-1; 
+    if ((j > -1) && (array[i] < array[j])) {
+        // array[j+1] = array[j];
+        let new_j = j-1;
+        return {array, i: i, j: new_j, swappedIndex1: array[j+1], swappedIndex2: array[j], j, finished:false}
     }
-    array[j+1] = current;
+
+    // array[j+1] = current;
     // }
+    // let n = array.length;
     if (i === n-1){
-        return {array, i: i+1, finished:true}    
+        return {finished:true}    
     }
-    return {array, i: i+1, finished:false} 
+    let new_j_here = i-1;
+
+    return {array, i: i+1, j: new_j_here, indexForSelect1: i-1, indexForSelect1: i, finished:false} 
 }
 
 
