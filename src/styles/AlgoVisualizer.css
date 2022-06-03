@@ -78,10 +78,15 @@
 
 .elements_visualization {
     height: 200px;
-    padding: 50px;
+    padding: 50px 50px 0 50px;
     display: flex;
-    overflow-x: scroll;
+    /* overflow-x: scroll; */
+    /* overflow-x: visible; */
     justify-content: center;
+}
+
+.elements_visualization_wrapper {
+    overflow-x: scroll;
 }
 
 /* Box */
@@ -118,4 +123,16 @@
     width: 80%;
     text-align: center;
     vertical-align: middle;
+}
+
+@media (max-width: 1000px) {
+    .algo_demo {
+        display: block; 
+        width: 100%;
+        margin-top: 50px;
+    }
+
+    .elements_visualization {
+        justify-content: start;
+    }
 }

@@ -6,6 +6,7 @@
 
 .prj_header {
     margin: 0;
+    padding: 20px 0;
 
     font-family: 'Lexend';
     font-style: normal;
@@ -41,4 +42,24 @@
     cursor: pointer;
     overflow: hidden;
     outline: none;
+}
+
+.highlighted {
+    font-weight: 400;
+    color: black;
+}
+
+@media (max-width: 1000px) {
+    .header {
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .prj_header {
+        justify-content: center;
+    }
+
+    .navigation {
+        justify-content: center;
+    }
 }

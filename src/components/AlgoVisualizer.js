@@ -6,6 +6,7 @@ import { Pause } from "@mui/icons-material";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { motion } from "framer-motion";
 import React, { useContext, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const PlayStatusContext = React.createContext({isPlaying: false, setIsPlaying: () => {}})
 
@@ -20,6 +21,8 @@ const AlgoVisualizer = ({algorithm}) => {
     const [isPlaying, setIsPlaying] = useState(false);
     // const [isFinished, setIsFinished] = useState(false);
 
+    const currentLocation = useLocation();
+
     const generateArray = () => {
         const generatedArray = Array.from({length: arraySizeForGen}, () => Math.floor(Math.random() * 100));
         setCurrentArray(generatedArray);        
@@ -32,6 +35,12 @@ const AlgoVisualizer = ({algorithm}) => {
     useEffect(() => {
         generateArray();
     }, []);
+
+    useEffect(() => {
+        setIsPlaying(false);
+        setCurrentArray(initialArray.slice());
+        setCurrentAlgoState({finished: false});
+    }, [currentLocation]);
 
     useEffect(() => {
         if (shouldUpdate && isPlaying) {
@@ -141,10 +150,8 @@ const AlgoControls = ({setShouldUpdate, setSortingSpeed, setCurrentArray, setCur
                 setIsPlaying(false);
                 }}><Pause /></IconButton>}
             <IconButton onClick={
-                () => {
-                    // It doesn't work :(
+                () => {                    
                     setIsPlaying(false);
-                    console.log("Initial array: " + initialArray);
                     setCurrentArray(initialArray.slice());
                     setCurrentAlgoState({finished: false});
                 }
@@ -159,7 +166,7 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
     const [animationForElements, setAnimationForElements] = useState([]);
     const [indexesForSwap, setIndexesForSwap] = useState({});
     const [indexesForSelect, setIndexesForSelect] = useState({});
-    const [keyForRerender, setKeyForRerender] = useState(0);
+    const [keyForRerender, setKeyForRerender] = useState(false);
 
     // When both animations are finished
     useEffect(() => {
@@ -170,8 +177,7 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
                 const newCurrentArray = swapElements(currentArray.slice(), swappedIndex1, swappedIndex2);
                 setCurrentArray(newCurrentArray);
                 setIndexesForSwap({});
-                setKeyForRerender(keyForRerender+1);
-                console.log("bruh");
+                setKeyForRerender(!keyForRerender);
             }
 
             setFirstAnimFinished(false);
@@ -227,28 +233,30 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
     }, [indexesForSelect]);
 
     let firstSetterSent = false;
-    return <div className="elements_visualization" key={keyForRerender}>
-        {
-            currentArray.map((el, index) => {
-                if (animationForElements[index]) {
-                    let setterFuncion;
-                    if (!firstSetterSent) {
-                        firstSetterSent = true;
-                        setterFuncion = () => setFirstAnimFinished(true);
-                    } else {
-                        setterFuncion = () => setSecondAnimFinished(true);
-                    }
+    return <div className="elements_visualization_wrapper">
+        <div className="elements_visualization" key={keyForRerender} style={currentArray.length > 7 ? {justifyContent: "start"} : {}}>
+            {
+                currentArray.map((el, index) => {
+                    if (animationForElements[index]) {
+                        let setterFuncion;
+                        if (!firstSetterSent) {
+                            firstSetterSent = true;
+                            setterFuncion = () => setFirstAnimFinished(true);
+                        } else {
+                            setterFuncion = () => setSecondAnimFinished(true);
+                        }
 
-                    const animation = animationForElements[index];
-                    let {duration} = animationForElements;
-                    duration = duration == undefined ? sortingSpeed : duration;
-                    return <AnimatedBox value={el} key={index} animation={animation} animationDuration={duration} onAnimationComplete={() => setterFuncion()} />
-                }
-                else {
-                    return <Box value={el} key={index}/>
-                }
-            })
-        }
+                        const animation = animationForElements[index];
+                        let {duration} = animationForElements;
+                        duration = duration == undefined ? sortingSpeed : duration;
+                        return <AnimatedBox value={el} key={index} animation={animation} animationDuration={duration} onAnimationComplete={() => setterFuncion()} />
+                    }
+                    else {
+                        return <Box value={el} key={index}/>
+                    }
+                })
+            }
+        </div>
     </div>
 }
 

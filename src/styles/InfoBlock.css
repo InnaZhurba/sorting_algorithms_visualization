@@ -43,3 +43,11 @@
 .complexity_type {
     display: flex;
 }
+
+@media (max-width: 1000px) {
+    .info_block {
+        display: block;
+        width: 100%;
+        margin: 50px 0;
+    }
+}
