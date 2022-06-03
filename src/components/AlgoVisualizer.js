@@ -1,10 +1,5 @@
 import "../styles/AlgoVisualizer.css";
 
-import { IconButton, Slider } from "@mui/material";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { Pause } from "@mui/icons-material";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { motion } from "framer-motion";
 import React, { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { InputField } from "./InputField";
@@ -108,6 +103,5 @@ const AlgoVisualizer = ({ algorithm }) => {
         </div>
     );
 };
-
 
 export default AlgoVisualizer;

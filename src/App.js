@@ -59,7 +59,7 @@ function App() {
             </div>
           </>
         } />
-        <Route path="/merge" element={
+        {/* <Route path="/merge" element={
           <>
             <Header highlightedLink={"/merge"} />
             <div className="main_body">
@@ -67,7 +67,7 @@ function App() {
               <AlgoVisualizer algorithm={bubbleSort}/>
             </div>
           </>
-        } />
+        } /> */}
       </Routes>
     </div>
   );

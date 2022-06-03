@@ -7,7 +7,7 @@ const links = {
     "/insertion": "Insertion",
     "/selection": "Selection",
     "/quick": "Quick",
-    "/merge": "Merge",
+    // "/merge": "Merge",
 };
 
 const Header = ({ highlightedLink }) => {
