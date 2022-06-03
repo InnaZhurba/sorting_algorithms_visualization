@@ -158,34 +158,31 @@ export const bubbleSort = ({i, j, n, arr, finished}) => {
 
 
 /*
- * i stands for the iteration count.
- * Usage:
- *
- * state = {array: [4, 3, 2, 1]};
- * while (state.finished !== true) {
- *     state = selectionSort(state);
- *     swap(state.toSwap1, state.toSwap2);
- * }
- * swap(state.toSwap1, state.toSwap2);
+ * i, j - iteration counters.
+ * minIndex - index of the current min element.
  */
+export const selectionSort = ({arr, i, j, minIndex}) => {
+    i = i === undefined ? 0 : i;
+    j = j === undefined ? i + 1 : j;
+    minIndex = minIndex === undefined ? i : minIndex;
 
-export const selectionSort = ({array, i}) => {
-    i = i == undefined ? 0 : i;
-
-    let minIndex = i;
-    for (let j = i + 1; j < array.length; j++) {
-        if (array[j] < array[minIndex]) {
-            minIndex = j;
-        }
+    let newMinIndex = minIndex;
+    if (arr[j] < arr[minIndex]) {
+        newMinIndex = j;
     }
 
-    if (i === minIndex || i === array.length - 1) {
-        return {swappedIndex1: minIndex, swappedIndex2: i, finished: true};
+    if (j < arr.length) {
+        return {
+            indexForSelect1: j, indexForSelect2: minIndex, i, j: j + 1, minIndex: newMinIndex,
+            finished: false
+        };
     }
 
-    // [array[minIndex], array[i]] = [array[i], array[minIndex]];
+    if (i === minIndex || i === arr.length - 2) {
+        return {finished: true};
+    }
 
-    return {array, i: i + 1, swappedIndex1: minIndex, swappedIndex2: i, finished: false};
+    return {i: i + 1, swappedIndex1: minIndex, swappedIndex2: i, finished: false};
 }
 
 
