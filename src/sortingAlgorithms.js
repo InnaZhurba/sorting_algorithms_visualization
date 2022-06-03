@@ -158,56 +158,65 @@ export const bubbleSort = ({i, j, n, arr, finished}) => {
 
 
 /*
- * i stands for the iteration count.
- * Usage:
- *
- * state = {array: [4, 3, 2, 1]};
- * while (state.finished !== true) {
- *     state = selectionSort(state);
- *     swap(state.toSwap1, state.toSwap2);
- * }
- * swap(state.toSwap1, state.toSwap2);
+ * i, j - iteration counters.
+ * minIndex - index of the current min element.
  */
+export const selectionSort = ({arr, i, j, minIndex}) => {
+    i = i === undefined ? 0 : i;
+    j = j === undefined ? i + 1 : j;
+    minIndex = minIndex === undefined ? i : minIndex;
 
-export const selectionSort = ({array, i}) => {
-    i = i == undefined ? 0 : i;
-
-    let minIndex = i;
-    for (let j = i + 1; j < array.length; j++) {
-        if (array[j] < array[minIndex]) {
-            minIndex = j;
-        }
+    let newMinIndex = minIndex;
+    if (arr[j] < arr[minIndex]) {
+        newMinIndex = j;
     }
 
-    if (i === minIndex || i === array.length - 1) {
-        return {swappedIndex1: minIndex, swappedIndex2: i, finished: true};
+    if (j < arr.length) {
+        return {
+            indexForSelect1: j, indexForSelect2: minIndex, i, j: j + 1, minIndex: newMinIndex,
+            finished: false
+        };
     }
 
-    // [array[minIndex], array[i]] = [array[i], array[minIndex]];
+    if (i === minIndex || i === arr.length - 2) {
+        return {finished: true};
+    }
 
-    return {array, i: i + 1, swappedIndex1: minIndex, swappedIndex2: i, finished: false};
+    return {i: i + 1, swappedIndex1: minIndex, swappedIndex2: i, finished: false};
 }
 
 
-export const insertionSort = ({array, i}) => {
-    i = typeof i === 'undefined' ? 1 : i;
+export const insertionSort = ({i, j, n, array, finished}) => {
+    i = i === undefined ? 1 : i;
+    j = j === undefined ? i - 1 : j;
+    n = n === undefined ? array.length : n;
+    finished = finished == undefined ? false : finished;
 
-    let n = array.length;
+
+    
+
+    // current = current === undefined ? array[i] : current;
+
     // for (let i = 1; i < n; i++) {
         // Choosing the first element in our unsorted subarray
-    let current = array[i];
+    // let current = array[i];
     // The last element of our sorted subarray
-    let j = i-1; 
-    while ((j > -1) && (current < array[j])) {
-        array[j+1] = array[j];
-        j--;
+    // let j = i-1; 
+    if ((j > -1) && (array[i] < array[j])) {
+        // array[j+1] = array[j];
+        let new_j = j-1;
+        return {array, i: i, j: new_j, swappedIndex1: array[j+1], swappedIndex2: array[j], j, finished:false}
     }
-    array[j+1] = current;
+
+    // array[j+1] = current;
     // }
+    // let n = array.length;
     if (i === n-1){
-        return {array, i: i+1, finished:true}    
+        return {finished:true}    
     }
-    return {array, i: i+1, finished:false} 
+    let new_j_here = i-1;
+
+    return {array, i: i+1, j: new_j_here, indexForSelect1: i-1, indexForSelect1: i, finished:false} 
 }
 
 /*
