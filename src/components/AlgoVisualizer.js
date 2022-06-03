@@ -161,7 +161,6 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
 
 
     useEffect(() => {
-        console.log("currentAlgoState bruh");
         const {swappedIndex1, swappedIndex2} = currentAlgoState;
         if (swappedIndex1 == undefined) {
             const {indexForSelect1, indexForSelect2} = currentAlgoState;
