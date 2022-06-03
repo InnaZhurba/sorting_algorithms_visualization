@@ -49,7 +49,7 @@ const AlgoVisualizer = ({algorithm}) => {
             
             setShouldUpdate(false);
         }
-    }, [shouldUpdate]);
+    }, [shouldUpdate, isPlaying]);
 
     return <div className="algo_demo">
         <PlayStatusContext.Provider value={{isPlaying: isPlaying, setIsPlaying: setIsPlaying}}>
@@ -72,7 +72,14 @@ const InputField = ({currentInput, setCurrentInput, setCurrentArray, setCurrentA
                 <input className="elements_input" type="text" id="elements-input" value={currentInput} onChange={
                     (ev) => {
                         if (!isPlaying) {
-                            setCurrentArray(ev.target.value.split(" "));
+                            const newCurrentArray = ev.target.value.split(" ").reduce((result, el) => {
+                                const parsedInt = parseInt(el);
+                                if (!isNaN(parsedInt)) {
+                                    result.push(parsedInt);
+                                }
+                                return result;
+                            }, []);
+                            setCurrentArray(newCurrentArray);
                             setCurrentInput(ev.target.value);
                             setCurrentAlgoState({finished: false});
                         }
@@ -82,16 +89,23 @@ const InputField = ({currentInput, setCurrentInput, setCurrentArray, setCurrentA
 }
 
 const ArrayGenerator = ({generateArray, arraySizeForGen, setArraySizeForGen}) => {
+    const {isPlaying} = useContext(PlayStatusContext);
     return <div className="size_generation">
         <div className="array_size">
             <label className="algo_description" >Array size: </label>
             <input className="size_input" type="text" id="size-input" value={arraySizeForGen} onChange={(ev) => {
-                const parsedInt = parseInt(ev.target.value);
-                setArraySizeForGen(isNaN(parsedInt) ? 0 : parsedInt);
+                if (!isPlaying) {
+                    const parsedInt = parseInt(ev.target.value);
+                    setArraySizeForGen(isNaN(parsedInt) ? 0 : parsedInt);
+                }
                 }}/>
         </div>
         <div className="generate_button_wrapper">
-            <button className="generate_button" type="button" onClick={() => generateArray()}>
+            <button className="generate_button" type="button" onClick={() => {
+                    if (!isPlaying) {
+                        generateArray();
+                    }
+                }}>
                 Generate
             </button>
         </div>
@@ -145,17 +159,24 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
     const [animationForElements, setAnimationForElements] = useState([]);
     const [indexesForSwap, setIndexesForSwap] = useState({});
     const [indexesForSelect, setIndexesForSelect] = useState({});
+    const [keyForRerender, setKeyForRerender] = useState(0);
 
     // When both animations are finished
     useEffect(() => {
         if (firstAnimFinished && secondAnimFinished) {
             console.log("both animations finished!");
+            const {swappedIndex1, swappedIndex2} = currentAlgoState;
+            if (swappedIndex1 !== undefined) {
+                const newCurrentArray = swapElements(currentArray.slice(), swappedIndex1, swappedIndex2);
+                setCurrentArray(newCurrentArray);
+                setIndexesForSwap({});
+                setKeyForRerender(keyForRerender+1);
+                console.log("bruh");
+            }
+
             setFirstAnimFinished(false);
             setSecondAnimFinished(false);
             
-            const {swappedIndex1, swappedIndex2} = currentAlgoState;
-            const newCurrentArray = swapElements(currentArray, swappedIndex1, swappedIndex2);
-            setCurrentArray(newCurrentArray);
             setShouldUpdate(true);
         }
     }, [firstAnimFinished, secondAnimFinished]);
@@ -201,11 +222,12 @@ const BoxContainer = ({currentAlgoState, currentArray, setCurrentArray, setShoul
         };
         newAnimationForElements["duration"] = sortingSpeed/2;
 
+        console.log(newAnimationForElements);
         setAnimationForElements(newAnimationForElements);
     }, [indexesForSelect]);
 
     let firstSetterSent = false;
-    return <div className="elements_visualization">
+    return <div className="elements_visualization" key={keyForRerender}>
         {
             currentArray.map((el, index) => {
                 if (animationForElements[index]) {
@@ -271,5 +293,6 @@ const swapElements = (arr, index1, index2) => {
     arr[index2] = temp;
     return arr;
 }
+
 
 export default AlgoVisualizer;
