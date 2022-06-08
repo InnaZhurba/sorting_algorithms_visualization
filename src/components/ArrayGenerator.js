@@ -1,6 +1,6 @@
 import "../styles/AlgoVisualizer.css";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { PlayStatusContext } from "./AlgoVisualizer";
 
 export const ArrayGenerator = ({

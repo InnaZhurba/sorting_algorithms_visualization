@@ -15,8 +15,13 @@ export const AlgoControls = ({
     initialArray,
 }) => {
     const { isPlaying, setIsPlaying } = useContext(PlayStatusContext);
+    
+    const calcSpeed = (value) => {
+        return 2.75 - (value / 100) * 2.5;
+    };
 
-    const defaultSpeed = 4.5 - (70 / 100) * 4;
+
+    const defaultSpeed = calcSpeed(50);
 
     useEffect(() => {
         setSortingSpeed(defaultSpeed);
@@ -26,11 +31,11 @@ export const AlgoControls = ({
         <div className="algo_navigation">
             <div className="slider_wrapper">
                 <Slider
-                    defaultValue={70}
+                    defaultValue={50}
                     aria-label="Default"
                     valueLabelDisplay="auto"
                     onChange={(ev) => {
-                        setSortingSpeed(4.5 - (ev.target.value / 100) * 4);
+                        setSortingSpeed(calcSpeed(ev.target.value));
                     }}
                 />
             </div>
