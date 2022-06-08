@@ -26,13 +26,14 @@ const InfoBlock = ({ title }) => {
 
     return (
         <div className="info_block">
-            <h1 className="algo_name" id="algo-name">
-                {title}
-            </h1>
-            <p className="algo_description" id="algo-description">
-                {descr}
-            </p>
-
+            <div className="description_block">
+                <h1 className="algo_name" id="algo-name">
+                    {title}
+                </h1>
+                <p className="algo_description" id="algo-description">
+                    {descr}
+                </p>
+            </div>
             <div className="complexity_block">
                 <h2 className="complexity_title">Complexity</h2>
                 {complexities.map((el, index) => {

@@ -12,7 +12,7 @@ export const ArrayGenerator = ({
     return (
         <div className="size_generation">
             <div className="array_size">
-                <label className="algo_description">Array size: </label>
+                <label className="array_size_text">Array size: </label>
                 <input
                     className="size_input"
                     type="text"

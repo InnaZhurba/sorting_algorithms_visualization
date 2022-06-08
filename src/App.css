@@ -11,7 +11,17 @@
 }
 
 @media (max-width: 1000px) {
+  .App {
+    padding: 0 50px;
+  }
+
   .main_body {
       flex-direction: column-reverse;
+  }
+}
+
+@media (max-width: 660px) {
+  .App {
+    padding: 0 20px;
   }
 }

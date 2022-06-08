@@ -5,10 +5,11 @@
 }
 
 .algo_name {
-    margin: 0;
+    margin: 0 0 10px 0;
     font-style: normal;
     font-weight: 600;
     font-size: 32px;
+    font-family: 'Open Sans';
     line-height: 43px;
     display: flex;
     align-items: center;
@@ -20,6 +21,7 @@
     font-style: normal;
     font-weight: 400;
     font-size: 24px;
+    font-family: 'Open Sans';
     line-height: 33px;
     text-align: justify;
     color: #000000;
@@ -31,10 +33,12 @@
 
 .complexity_title {
     margin: 0;
+    margin: 10px 0;
     font-style: normal;
     font-weight: 600;
     font-size: 24px;
     line-height: 33px;
+    font-family: 'Open Sans';
     display: flex;
     align-items: center;
     color: #000000;
@@ -42,12 +46,57 @@
 
 .complexity_type {
     display: flex;
+    font-family: 'Open Sans';
 }
 
 @media (max-width: 1000px) {
     .info_block {
-        display: block;
+        display: flex;
+        flex-direction: row;
         width: 100%;
         margin: 50px 0;
+    }
+
+    .complexity_block {
+        margin: 0 0 0 20px;
+        padding: 0 0 0 20px;
+        border-left: 1px solid black;
+    }
+
+    .description_block {
+        /* width: 50%; */
+    }
+
+    .algo_description {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 660px) {
+    .info_block {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin: 50px 0;
+    }
+
+    .complexity_block {
+        margin: 0;
+        padding: 0;
+        border: none;
+    }
+
+    .algo_description {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 375px) {
+    .algo_description {
+        font-size: 15px;
+    }
+
+    .algo_name {
+        font-size: 26px;
     }
 }
