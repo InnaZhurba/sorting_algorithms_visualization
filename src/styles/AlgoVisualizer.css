@@ -75,6 +75,11 @@
     color: #FFFFFF;
 }
 
+.generate_button:hover {
+    background-color: #3fa160;
+    transition: 100ms;
+}
+
 .size_input {
     width: 40px;
     height: 40px;
